@@ -25,10 +25,12 @@ args() {
     usage
     exit 1
   fi
-  if [[ $2 =~ ^(virtualbox|vmware)$ ]]; then
-    echo "$(basename $0): illegal option $2"
-    usage
-    exit 1
+  if [ $# -lt 1 ]; then
+      if [[ $2 =~ ^(virtualbox|vmware)$ ]]; then
+        echo "$(basename $0): illegal option $2"
+        usage
+        exit 1
+      fi
   fi
 
 

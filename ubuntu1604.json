@@ -1,4 +1,5 @@
 {
+    "_comment": "Build with `packer build ubuntu1604.json`",
     "provisioners": [
         {
             "type": "shell",
@@ -139,6 +140,7 @@
         }
     ],
     "variables": {
-        "hostname": "vagrant"
+        "hostname": "vagrant",
+        "version": "1.0.{{timestamp}}"
     }
 }

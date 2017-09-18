@@ -1,3 +1,7 @@
 ---
 - src: geerlingguy.packer-debian
 - src: geerlingguy.nfs
+- src: tersmitten.locales
+- src: cmprescott.dnsmasq
+- src: toopy.lxc-dev
+- src: gantsign.keyboard

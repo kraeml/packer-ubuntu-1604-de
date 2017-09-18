@@ -3,12 +3,32 @@
   become: yes
   gather_facts: yes
 
+  vars:
+    - locales_present:
+        - en_US.UTF-8
+        - de_DE.UTF-8
+    - locales_language_packs_present:
+        - language-pack-en
+        - language-pack-en-base
+        - language-pack-de
+        - language-pack-de-base
+    - locales_default:
+        lang: de_DE.UTF-8
+        # language: de_DE.UTF-8
+
   roles:
-    - geerlingguy.nfs
-    - geerlingguy.packer-debian
+    - { role: geerlingguy.nfs }
+    - { role: geerlingguy.packer-debian }
+    - { role: tersmitten.locales, tags: ['testing'] }
+    - { role: gantsign.keyboard, keyboard_model: pc105, keyboard_layout: de, tags: ['testing'] }
+    - { role: cmprescott.dnsmasq, dnsmasq_dns_interfaces: [ "interface=enp0s8" ], tags: ['testing'] }
+    - { role: toopy.lxc-dev, tags: ['testing']}
 
   tasks:
-    - apt: "name={{ item }} state=installed"
+    - name: "Install needed packages"
+      apt:
+        name: "{{ item }}"
+        state: installed
       with_items:
         - git
         - wget

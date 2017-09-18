@@ -21,7 +21,7 @@
     - { role: geerlingguy.packer-debian }
     - { role: tersmitten.locales, tags: ['testing'] }
     - { role: gantsign.keyboard, keyboard_model: pc105, keyboard_layout: de, tags: ['testing'] }
-    - { role: cmprescott.dnsmasq, dnsmasq_dns_interfaces: [ "interface=enp0s8" ], tags: ['testing'] }
+    - { role: cmprescott.dnsmasq, dnsmasq_dns_interfaces: [], tags: ['testing'] }
     - { role: toopy.lxc-dev, tags: ['testing']}
 
   tasks:
@@ -31,6 +31,34 @@
         state: installed
       with_items:
         - git
+        - build-essential
+        - automake
         - wget
         - curl
         - vim
+        - screen
+        - lvm2
+        - python3-pip
+        - python3-virtualenv
+        - libffi-dev
+        - libssl-dev
+        - cowsay
+        - sshpass
+        - python3-dev
+        - yum
+        - rpm
+        - zypper
+        - qemu-user-static
+
+    - name: Create a stopped container
+      lxc_container:
+        name: "test-container-{{item}}"
+        container_log: true
+        template: "{{item}}"
+        state: stopped
+      with_items:
+        - ubuntu
+        - debian
+        - alpine
+        - centos
+        - fedora

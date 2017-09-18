@@ -15,14 +15,24 @@
     - locales_default:
         lang: de_DE.UTF-8
         # language: de_DE.UTF-8
+    - container_prefix: "test-container-"
+    - lxc_config_path: "/var/lib/lxc/"
+    - timezone_zone: "Europe/Berlin"
+    - lxc_templates:
+      - ubuntu
+      - debian
+      - alpine
+      - centos
+      - fedora
 
   roles:
     - { role: geerlingguy.nfs }
     - { role: geerlingguy.packer-debian }
-    - { role: tersmitten.locales, tags: ['testing'] }
-    - { role: gantsign.keyboard, keyboard_model: pc105, keyboard_layout: de, tags: ['testing'] }
-    - { role: cmprescott.dnsmasq, dnsmasq_dns_interfaces: [], tags: ['testing'] }
-    - { role: toopy.lxc-dev, tags: ['testing']}
+    - { role: tersmitten.locales }
+    - { role: tersmitten.timezone, tags: ['testing'] }
+    - { role: gantsign.keyboard, keyboard_model: pc105, keyboard_layout: de }
+    - { role: cmprescott.dnsmasq, dnsmasq_dns_interfaces: [] }
+    - { role: toopy.lxc-dev }
 
   tasks:
     - name: "Install needed packages"
@@ -52,13 +62,35 @@
 
     - name: Create a stopped container
       lxc_container:
-        name: "test-container-{{item}}"
+        name: "{{container_prefix}}{{item}}"
         container_log: true
         template: "{{item}}"
         state: stopped
-      with_items:
-        - ubuntu
-        - debian
-        - alpine
-        - centos
-        - fedora
+      with_items: "{{lxc_templates}}"
+      tags:
+        - testing
+
+    - name: Ensure non legacy key for lxc
+      command: lxc-update-config -c config
+      args:
+        chdir: "{{lxc_config_path}}{{container_prefix}}{{item}}"
+        creates: "{{lxc_config_path}}{{container_prefix}}{{item}}/config.backup"
+      with_items: "{{lxc_templates}}"
+      tags:
+        - testing
+
+    - name: configure screen
+      lineinfile:
+        path: /etc/screenrc
+        regexp: '^caption always'
+        line: 'caption always "%{rw} * | %H * $LOGNAME | %{bw}%c %D | %{-}%-Lw%{rw}%50>%{rW}%n%f* %t %{-}%+Lw%<"'
+
+    - name: configure bashrc with screen
+      blockinfile:
+        path: /home/vagrant/.bashrc
+        block: |
+          if [ "$TERM" != "screen" ] && [ "$SSH_CONNECTION" != "" ]; then
+            /usr/bin/screen -S sshscreen -d -R
+          fi
+      tags:
+        - testing

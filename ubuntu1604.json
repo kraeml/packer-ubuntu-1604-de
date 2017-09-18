@@ -74,8 +74,8 @@
             "virtualbox_version_file": ".vbox_version",
             "vm_name": "packer-ubuntu-16.04-amd64",
             "vboxmanage": [
-                ["modifyvm", "{{.Name}}", "--memory", "1024"],
-                ["modifyvm", "{{.Name}}", "--cpus", "1"]
+                ["modifyvm", "{{.Name}}", "--memory", "{{user `memory`}}"],
+                ["modifyvm", "{{.Name}}", "--cpus", "{{user `cpus`}}"]
             ]
         },
         {
@@ -128,8 +128,8 @@
             "vm_name": "packer-ubuntu-16.04-amd64",
             "vmx_data": {
                 "cpuid.coresPerSocket": "1",
-                "memsize": "1024",
-                "numvcpus": "1"
+                "memsize": "{{user `memory`}}",
+                "numvcpus": "{{user `cpus`}}"
             }
         }
     ],
@@ -141,6 +141,8 @@
     ],
     "variables": {
         "hostname": "vagrant",
-        "version": "1.0.{{timestamp}}"
+        "version": "1.0.{{timestamp}}",
+        "memory": "2048",
+        "cpus": "2"
     }
 }

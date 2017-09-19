@@ -6,3 +6,6 @@
 - src: cmprescott.dnsmasq
 - src: toopy.lxc-dev
 - src: gantsign.keyboard
+- src: tersmitten.pip
+- src: tersmitten.virtualenv
+- src: tersmitten.ansible

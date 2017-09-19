@@ -33,6 +33,9 @@
     - { role: gantsign.keyboard, keyboard_model: pc105, keyboard_layout: de }
     - { role: cmprescott.dnsmasq, dnsmasq_dns_interfaces: [] }
     - { role: toopy.lxc-dev }
+    - { role: tersmitten.pip }
+    - { role: tersmitten.virtualenv }
+    - { role: tersmitten.ansible, tags: ["ansible"] }
 
   tasks:
     - name: "Install needed packages"
@@ -41,20 +44,23 @@
         state: installed
       with_items:
         - git
+        - git-flow
         - build-essential
         - automake
         - wget
         - curl
         - vim
         - screen
+        - htop
         - lvm2
+        - python3
         - python3-pip
         - python3-virtualenv
+        - python3-dev
         - libffi-dev
         - libssl-dev
         - cowsay
         - sshpass
-        - python3-dev
         - yum
         - rpm
         - zypper
@@ -68,22 +74,22 @@
         state: stopped
       with_items: "{{lxc_templates}}"
 
-    - name: Create a stopped container
+    - name: Remove container
       lxc_container:
         name: "{{container_prefix}}{{item}}"
         container_log: true
         template: "{{item}}"
         state: absent
       with_items: "{{lxc_templates}}"
-      tags:
-        - testing
 
-    - name: Ensure non legacy key for lxc
-      command: lxc-update-config -c config
-      args:
-        chdir: "{{lxc_config_path}}{{container_prefix}}{{item}}"
-        creates: "{{lxc_config_path}}{{container_prefix}}{{item}}/config.backup"
-      with_items: "{{lxc_templates}}"
+#    - name: Ensure non legacy key for lxc
+#      command: lxc-update-config -c config
+#      args:
+#        chdir: "{{lxc_config_path}}{{container_prefix}}{{item}}"
+#        creates: "{{lxc_config_path}}{{container_prefix}}{{item}}/config.backup"
+#      with_items: "{{lxc_templates}}"
+#      tags:
+#        - testing
 
     - name: configure screen
       lineinfile:
@@ -96,5 +102,52 @@
         path: /home/vagrant/.bashrc
         block: |
           if [ "$TERM" != "screen" ] && [ "$SSH_CONNECTION" != "" ]; then
-            /usr/bin/screen -S sshscreen -d -R  && exit
+            /usr/bin/screen -ls sshscreen || /usr/bin/screen -dmS sshscreen
+            echo "SSH no active"
+            /usr/bin/screen -S sshscreen -D -RR  && exit
           fi
+
+    - name: Ensure ansible in user home exists
+      become: yes
+      become_user: vagrant
+      file:
+        path: "/home/vagrant/{{item}}"
+        state: directory
+        owner: vagrant
+        group: vagrant
+      with_items:
+        - ais
+        - bsa
+        - itec
+        - ins
+
+    - name: Git config
+      become: yes
+      become_user: vagrant
+      git_config:
+        name: "{{item.name}}"
+        value: "{{item.value}}"
+        scope: global
+      with_items:
+        - {
+            name: "user.email",
+            value: "vagrant@example.com"
+        }
+        - {
+            name: "user.name",
+            value: "vagrant"
+        }
+        - {
+            name: "core.editor",
+            value: "vim"
+        }
+
+    - name: Clone git
+      become_user: vagrant
+      become: yes
+      git:
+        dest: /home/vagrant/ais/hands-on-ansible
+        force: yes
+        recursive: yes
+        repo: https://github.com/kraeml/hands-on-ansible.git
+        version: master

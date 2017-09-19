@@ -16,7 +16,11 @@
         {
             "type": "ansible-local",
             "playbook_file": "ansible/main.yml",
-            "galaxy_file": "requirements.yml"
+            "galaxy_file": "requirements.yml",
+            "extra_arguments": [
+                "--skip-tags \"ansible\"",
+                "--skip-tags \"testing\""
+            ]
         },
         {
             "type": "shell",

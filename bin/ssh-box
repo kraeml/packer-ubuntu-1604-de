@@ -43,23 +43,23 @@ args "$@"
 box_filename=$(basename "${box_path}")
 box_name=${box_filename%.*}
 
-tmp_file=boxcutter-test-${box_name}
-tmp_path=$(mktemp -d -t ${tmp_file} 2>/dev/null || mktemp -d -t ${tmp_file}.XXXXXX)
-cleanup() {
-  rm -rf ${tmp_path}
-}
-trap cleanup EXIT
+# tmp_file=boxcutter-test-${box_name}
+# tmp_path=$(mktemp -d -t ${tmp_file} 2>/dev/null || mktemp -d -t ${tmp_file}.XXXXXX)
+# cleanup() {
+#  rm -rf ${tmp_path}
+# }
+# trap cleanup EXIT
 
-vagrant box remove ${box_name} --provider ${box_provider} || true
-vagrant box add ${box_name} ${box_path}
+vagrant box remove file://builds/${box_name}.box --provider ${box_provider} || true
+vagrant box add file://builds/${box_name}.box ${box_path}
 
-pushd ${tmp_path}
-vagrant init ${box_name}
+# pushd ${tmp_path}
+# vagrant init ${box_name}
 VAGRANT_LOG=warn vagrant up --provider ${vagrant_provider}
 vagrant ssh
 # vagrant won't actually tear down the VM
 sleep 10
 vagrant destroy -f
-popd
+# popd
 
-vagrant box remove ${box_name} --provider ${box_provider}
+vagrant box remove file://builds/${box_name}.box --provider ${box_provider}

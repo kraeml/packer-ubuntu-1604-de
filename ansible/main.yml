@@ -29,7 +29,7 @@
     - { role: geerlingguy.nfs }
     - { role: geerlingguy.packer-debian }
     - { role: tersmitten.locales }
-    - { role: tersmitten.timezone, tags: ['testing'] }
+    - { role: tersmitten.timezone }
     - { role: gantsign.keyboard, keyboard_model: pc105, keyboard_layout: de }
     - { role: cmprescott.dnsmasq, dnsmasq_dns_interfaces: [] }
     - { role: toopy.lxc-dev }
@@ -67,6 +67,14 @@
         template: "{{item}}"
         state: stopped
       with_items: "{{lxc_templates}}"
+
+    - name: Create a stopped container
+      lxc_container:
+        name: "{{container_prefix}}{{item}}"
+        container_log: true
+        template: "{{item}}"
+        state: absent
+      with_items: "{{lxc_templates}}"
       tags:
         - testing
 
@@ -76,8 +84,6 @@
         chdir: "{{lxc_config_path}}{{container_prefix}}{{item}}"
         creates: "{{lxc_config_path}}{{container_prefix}}{{item}}/config.backup"
       with_items: "{{lxc_templates}}"
-      tags:
-        - testing
 
     - name: configure screen
       lineinfile:
@@ -90,7 +96,5 @@
         path: /home/vagrant/.bashrc
         block: |
           if [ "$TERM" != "screen" ] && [ "$SSH_CONNECTION" != "" ]; then
-            /usr/bin/screen -S sshscreen -d -R
+            /usr/bin/screen -S sshscreen -d -R  && exit
           fi
-      tags:
-        - testing

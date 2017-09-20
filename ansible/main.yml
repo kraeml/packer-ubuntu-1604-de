@@ -17,7 +17,7 @@
         # language: de_DE.UTF-8
     - container_prefix: "test-container-"
     - lxc_config_path: "/var/lib/lxc/"
-    - timezone_zone: "Europe/Berlin"
+    - timezone_zone: "Etc/UTC"
     - lxc_templates:
       - ubuntu
       - debian
@@ -52,6 +52,7 @@
         - vim
         - screen
         - htop
+        - sqlite
         - lvm2
         - python3
         - python3-pip
@@ -140,6 +141,10 @@
         - {
             name: "core.editor",
             value: "vim"
+        }
+        - {
+            name: "push.default",
+            value: "simple"
         }
 
     - name: Clone git

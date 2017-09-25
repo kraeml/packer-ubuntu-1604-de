@@ -20,6 +20,13 @@
             "extra_arguments": ["--skip-tags=ansible,testing"]
         },
         {
+            "environment_vars": ["DESKTOP={{user `desktop`}}"],
+            "type": "shell",
+            "execute_command":
+                "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+            "script": "scripts/desktop.sh"
+        },
+        {
             "type": "shell",
             "execute_command":
                 "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
@@ -144,6 +151,7 @@
         "hostname": "vagrant",
         "version": "1.0.{{timestamp}}",
         "memory": "2048",
-        "cpus": "2"
+        "cpus": "2",
+        "desktop": "false"
     }
 }

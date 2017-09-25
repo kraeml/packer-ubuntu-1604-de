@@ -1,5 +1,6 @@
 {
     "_comment":
         "Build with `packer build -var-file=ubuntu1604-de.json ubuntu1604.json`",
-    "hostname": "ubuntu-de"
+    "hostname": "ubuntu-de",
+    "desktop": "false"
 }

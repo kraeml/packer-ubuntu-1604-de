@@ -27,24 +27,161 @@
       locales_default:
         lang: de_DE.UTF-8
         # language: de_DE.UTF-8
+      tags:
+        - locale_de
     - role: tersmitten.timezone
       timezone_zone: "Etc/UTC"
+      tags:
+        - locale_de
     - role: gantsign.keyboard
       keyboard_model: pc105
       keyboard_layout: de
+      tags:
+        - locale_de
+    # Add lcx development
     - role: cmprescott.dnsmasq
       dnsmasq_dns_interfaces: []
+      tags:
+        - lxc-dev
     - role: toopy.lxc-dev
       lxc_config_path: "/var/lib/lxc/"
+      tags:
+        - lxc-dev
+    # Add Node.js
+    - role: geerlingguy.nodejs
+      nodejs_version: 6.x
+      nodejs_install_npm_user: vagrant
+      nodejs_npm_global_packages:
+        - name: grunt-cli
+        - name: grunt-init
+        - name: gulp-cli
+        - name: npm-check-updates
+        - name: typescript
+        - name: ts-node
+        - name: typings
+      tags:
+        - nodejs
     - role: tersmitten.pip
+      tags:
+        - python-dev
     - role: tersmitten.virtualenv
+      tags:
+        - python-dev
     - role: tersmitten.ansible
       tags:
         - ansible
     - role: gantsign.xdesktop
       xdesktop_desktop: unity
+      tags:
+        - desktop
     - role: gantsign.lightdm
       lightdm_autologin_user: vagrant
+      tags:
+        - desktop
+
+    # Install Terminator terminal emulator
+    - role: gantsign.terminator
+      tags:
+        - desktop
+
+
+    # Install Google Chrome web broswer
+    - role: cmprescott.chrome
+      tags:
+        - desktop
+        - chrome
+
+
+    # Set the default web browser
+    # This is only a partial solution as Google Chrome will still ask if you
+    # want to make it the default browser when it first runs.
+    - role: gantsign.default-web-browser
+      tags:
+        - desktop
+        - chrome
+
+      default_web_browser: google-chrome
+
+    #
+    # Install Atom editor
+    - role: gantsign.atom
+      tags:
+        - desktop
+        - atom
+
+      users:
+        - username: vagrant
+          atom_packages:
+            - editorconfig
+            - minimap
+            - linter
+            - atom-beautify
+            - file-icons
+          atom_config:
+            "*":
+              core:
+                projectHome: "/home/vagrant/workspace"
+              editor:
+                showIndentGuide: true
+                showInvisibles: true
+
+    # Install Go package for Atom
+    - role: gantsign.atom-packages
+      tags:
+        - desktop
+        - atom
+        - golang
+
+      users:
+        - username: vagrant
+          atom_packages:
+            - go-plus
+
+    # Install Go language SDK
+    - role: gantsign.golang
+      tags:
+        - golang
+
+      golang_gopath: '$HOME/workspace-go'
+
+    - role: tschifftner.firefox
+      tags:
+        - desktop
+
+      firefox_language: 'de'
+      firefox_os: 'linux-x86_64'
+
+    # Install Java JDK 8
+    - role: gantsign.java
+      tags:
+        - java
+
+      java_version: 8u144
+      java_license_declaration: 'I accept the "Oracle Binary Code License Agreement for the Java SE Platform Products and JavaFX" under the terms at http://www.oracle.com/technetwork/java/javase/terms/license/index.html'
+
+    # Install Java JDK 9
+#    - role: gantsign.java
+#      tags:
+#        - java
+#
+#      java_version: '9+181'
+#      java_is_default_installation: no
+#      java_fact_group_name: java_9
+#      java_license_declaration: 'I accept the "Oracle Binary Code License Agreement for the Java SE Platform Products and JavaFX" under the terms at http://www.oracle.com/technetwork/java/javase/terms/license/index.html'
+
+    # Configure Java environment variables
+    - role: franklinkim.environment
+      tags:
+        - java
+
+      environment_config:
+        JAVA_HOME: "{{ ansible_local.java.general.home }}"
+
+    - role: arknoll.selenium
+      tags:
+        - web-dev
+
+      selenium_install_firefox: yes
 
   tasks:
     - name: "Install needed packages"
@@ -71,10 +208,40 @@
         - libssl-dev
         - cowsay
         - sshpass
+
+    - name: "Install lxc-dev needed packages"
+      apt:
+        name: "{{ item }}"
+        state: installed
+      with_items:
         - yum
         - rpm
         - zypper
         - qemu-user-static
+      tags:
+        - lxc-dev
+
+    - name: "Install desktop needed packages"
+      apt:
+        name: "{{ item }}"
+        state: installed
+      with_items:
+        - hunspell-de-ch
+        - wogerman
+        - hunspell-de-at
+        - hunspell-en-us
+        - wbritish
+        - hunspell-de-de
+        - language-pack-gnome-de
+        - wngerman
+        - hunspell-en-au
+        - wswiss
+        - hunspell-en-za
+        - hunspell-en-ca
+        - wamerican
+        - hunspell-en-gb
+      tags:
+        - desktop
 
     - name: Create a stopped container
       lxc_container:
@@ -83,6 +250,8 @@
         template: "{{item}}"
         state: stopped
       with_items: "{{lxc_templates}}"
+      tags:
+        - lxc-dev
 
     - name: Remove container
       lxc_container:
@@ -91,21 +260,16 @@
         template: "{{item}}"
         state: absent
       with_items: "{{lxc_templates}}"
-
-#    - name: Ensure non legacy key for lxc
-#      command: lxc-update-config -c config
-#      args:
-#        chdir: "{{lxc_config_path}}{{container_prefix}}{{item}}"
-#        creates: "{{lxc_config_path}}{{container_prefix}}{{item}}/config.backup"
-#      with_items: "{{lxc_templates}}"
-#      tags:
-#        - testing
+      tags:
+        - lxc-dev
 
     - name: configure screen
       lineinfile:
         path: /etc/screenrc
         regexp: '^caption always'
         line: 'caption always "%{rw} * | %H * $LOGNAME | %{bw}%c %D | %{-}%-Lw%{rw}%50>%{rW}%n%f* %t %{-}%+Lw%<"'
+      tags:
+        - rdf
 
     - name: configure bashrc with screen
       blockinfile:
@@ -116,8 +280,10 @@
             echo "SSH no active"
             /usr/bin/screen -S sshscreen -D -RR  && exit
           fi
+      tags:
+        - rdf
 
-    - name: Ensure ansible in user home exists
+    - name: Ensure rdf directories exists
       become: yes
       become_user: vagrant
       file:
@@ -130,6 +296,8 @@
         - bsa
         - itec
         - ins
+      tags:
+        - rdf
 
     - name: Git config
       become: yes
@@ -165,3 +333,5 @@
         recursive: yes
         repo: https://github.com/kraeml/hands-on-ansible.git
         version: master
+      tags:
+        - lxc-dev

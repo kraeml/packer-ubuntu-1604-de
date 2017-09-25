@@ -17,7 +17,7 @@
             "type": "ansible-local",
             "playbook_file": "ansible/main.yml",
             "galaxy_file": "requirements.yml",
-            "extra_arguments": ["--skip-tags=ansible,testing"]
+            "extra_arguments": ["--skip-tags=ansible,testing,lxc-dev"]
         },
         {
             "type": "shell",

@@ -59,21 +59,49 @@
         - name: typescript
         - name: ts-node
         - name: typings
+        - name: pm2
+        - name: socket.io
+        - name: sqlite3
+        - name: mongoose
+        - name: mysql
+        - name: express
+        - name: javascripting
+        - name: how-to-npm
+        - name: scope-chains-closures
+        - name: stream-adventure
+        - name: how-to-markdown
+        - name: learnyouhtml
+        - name: learnyounode
+        - name: functional-javascript-workshop
+        - name: bytewiser
+        - name: expressworks
+        - name: bug-clinic
+        - name: async-you
+        - name: test-anything
+        - name: learnyoumongo
+        - name: torrential
+        - name: html-validator-cli
       tags:
         - nodejs
+        - testing
+
     - role: tersmitten.pip
       tags:
         - python-dev
+
     - role: tersmitten.virtualenv
       tags:
         - python-dev
+
     - role: tersmitten.ansible
       tags:
         - ansible
+
     - role: gantsign.xdesktop
       xdesktop_desktop: unity
       tags:
         - desktop
+
     - role: gantsign.lightdm
       lightdm_autologin_user: vagrant
       tags:
@@ -84,13 +112,11 @@
       tags:
         - desktop
 
-
     # Install Google Chrome web broswer
     - role: cmprescott.chrome
       tags:
         - desktop
         - chrome
-
 
     # Set the default web browser
     # This is only a partial solution as Google Chrome will still ask if you
@@ -99,8 +125,14 @@
       tags:
         - desktop
         - chrome
-
       default_web_browser: google-chrome
+
+    - role: nicolai86.ansible-phantomjs
+      tags:
+        - web-dev
+        - testing
+      phantomjs_version: "2.1.1"
+      phantomjs_url: "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-{{phantomjs_version}}-linux-x86_64.tar.bz2"
 
     #
     # Install Atom editor
@@ -108,13 +140,15 @@
       tags:
         - desktop
         - atom
-
       users:
         - username: vagrant
           atom_packages:
             - editorconfig
             - minimap
             - linter
+            - linter-ui-default
+            - busy-signal
+            - intentions
             - atom-beautify
             - file-icons
           atom_config:
@@ -131,7 +165,6 @@
         - desktop
         - atom
         - golang
-
       users:
         - username: vagrant
           atom_packages:
@@ -141,23 +174,49 @@
     - role: gantsign.golang
       tags:
         - golang
-
       golang_gopath: '$HOME/workspace-go'
 
     - role: tschifftner.firefox
       tags:
         - desktop
-
       firefox_language: 'de'
       firefox_os: 'linux-x86_64'
 
-    # Install Java JDK 8
-    - role: gantsign.java
+    - role: geerlingguy.java
+      when: "ansible_os_family == 'Debian'"
+      java_packages:
+        - openjdk-8-jdk
       tags:
         - java
 
-      java_version: 8u144
-      java_license_declaration: 'I accept the "Oracle Binary Code License Agreement for the Java SE Platform Products and JavaFX" under the terms at http://www.oracle.com/technetwork/java/javase/terms/license/index.html'
+    - role: geerlingguy.ruby
+      become: yes
+      ruby_install_gems_user: vagrant
+      ruby_install_from_source: true
+      ruby_version: 2.4.2
+      ruby_download_url: "http://cache.ruby-lang.org/pub/ruby/2.4/ruby-{{ruby_version}}.tar.gz"
+      ruby_install_gems:
+        - inspec
+        - capybara
+        - selenium-webdriver
+        - cucumber
+        - rspec
+        - sinatra
+        - poltergeist
+        - rspec-expectations
+        - launchy
+        - rest-client
+      tags:
+        - ruby
+        - testing
+
+#    # Install Java JDK 8
+#    - role: gantsign.java
+#      tags:
+#        - java
+#
+#      java_version: 8u144
+#      java_license_declaration: 'I accept the "Oracle Binary Code License Agreement for the Java SE Platform Products and JavaFX" under the terms at http://www.oracle.com/technetwork/java/javase/terms/license/index.html'
 
     # Install Java JDK 9
 #    - role: gantsign.java
@@ -169,19 +228,18 @@
 #      java_fact_group_name: java_9
 #      java_license_declaration: 'I accept the "Oracle Binary Code License Agreement for the Java SE Platform Products and JavaFX" under the terms at http://www.oracle.com/technetwork/java/javase/terms/license/index.html'
 
-    # Configure Java environment variables
-    - role: franklinkim.environment
-      tags:
-        - java
-
-      environment_config:
-        JAVA_HOME: "{{ ansible_local.java.general.home }}"
+#    # Configure Java environment variables
+#    - role: franklinkim.environment
+#      tags:
+#        - java
+#
+#      environment_config:
+#        JAVA_HOME: "{{ ansible_local.java.general.home }}"
 
     - role: arknoll.selenium
+      selenium_install_firefox: yes
       tags:
         - web-dev
-
-      selenium_install_firefox: yes
 
   tasks:
     - name: "Install needed packages"

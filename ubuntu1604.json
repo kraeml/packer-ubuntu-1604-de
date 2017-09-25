@@ -17,7 +17,9 @@
             "type": "ansible-local",
             "playbook_file": "ansible/main.yml",
             "galaxy_file": "requirements.yml",
-            "extra_arguments": ["--skip-tags=ansible,testing,lxc-dev"]
+            "extra_arguments": [
+                "--skip-tags={{ user ansible_skip_tags | ansible,testing }}"
+            ]
         },
         {
             "type": "shell",
@@ -145,6 +147,7 @@
         "version": "1.0.{{timestamp}}",
         "memory": "2048",
         "cpus": "2",
-        "desktop": "false"
+        "desktop": "false",
+        "ansible_skip_tags": "ansible,testing"
     }
 }

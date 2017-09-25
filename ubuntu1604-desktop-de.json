@@ -14,5 +14,6 @@
     "preseed": "preseed.cfg",
     "update": "true",
     "vagrantfile_template": "tpl/vagrantfile-ubuntu1604-desktop.tpl",
-    "hostname": "ubuntu-de"
+    "hostname": "ubuntu-de",
+    "ansible_skip_tags": "ansible,testing"
 }

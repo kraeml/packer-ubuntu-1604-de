@@ -2,6 +2,8 @@
 - src: geerlingguy.packer-debian
 - src: geerlingguy.nfs
 - src: geerlingguy.nodejs
+- src: geerlingguy.java
+- src: geerlingguy.ruby
 - src: tersmitten.locales
 - src: tersmitten.timezone
 - src: cmprescott.dnsmasq
@@ -12,9 +14,11 @@
   name: gantsign.xdesktop
 - src: gantsign.terminator
 - src: tschifftner.firefox
-- src: gantsign.java
+# - src: gantsign.java
 - src: arknoll.selenium
-- src: franklinkim.environment
+- src: nicolai86.ansible-phantomjs
+# - src: franklinkim.environment
+# - src: rvm_io.ruby
 - src: cmprescott.chrome
 - src: gantsign.default-web-browser
 - src: gantsign.atom

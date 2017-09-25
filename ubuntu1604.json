@@ -20,13 +20,6 @@
             "extra_arguments": ["--skip-tags=ansible,testing"]
         },
         {
-            "environment_vars": ["DESKTOP={{user `desktop`}}"],
-            "type": "shell",
-            "execute_command":
-                "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
-            "script": "scripts/desktop.sh"
-        },
-        {
             "type": "shell",
             "execute_command":
                 "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",

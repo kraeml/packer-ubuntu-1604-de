@@ -36,6 +36,8 @@
     - { role: tersmitten.pip }
     - { role: tersmitten.virtualenv }
     - { role: tersmitten.ansible, tags: ["ansible"] }
+    - { role: gantsign.xdesktop, xdesktop_desktop: unity }
+    - { role: gantsign.lightdm, lightdm_autologin_user: vagrant }
 
   tasks:
     - name: "Install needed packages"

@@ -4,20 +4,7 @@
   gather_facts: yes
 
   vars:
-    - locales_present:
-        - en_US.UTF-8
-        - de_DE.UTF-8
-    - locales_language_packs_present:
-        - language-pack-en
-        - language-pack-en-base
-        - language-pack-de
-        - language-pack-de-base
-    - locales_default:
-        lang: de_DE.UTF-8
-        # language: de_DE.UTF-8
     - container_prefix: "test-container-"
-    - lxc_config_path: "/var/lib/lxc/"
-    - timezone_zone: "Etc/UTC"
     - lxc_templates:
       - ubuntu
       - debian
@@ -26,18 +13,38 @@
       - fedora
 
   roles:
-    - { role: geerlingguy.nfs }
-    - { role: geerlingguy.packer-debian }
-    - { role: tersmitten.locales }
-    - { role: tersmitten.timezone }
-    - { role: gantsign.keyboard, keyboard_model: pc105, keyboard_layout: de }
-    - { role: cmprescott.dnsmasq, dnsmasq_dns_interfaces: [] }
-    - { role: toopy.lxc-dev }
-    - { role: tersmitten.pip }
-    - { role: tersmitten.virtualenv }
-    - { role: tersmitten.ansible, tags: ["ansible"] }
-    - { role: gantsign.xdesktop, xdesktop_desktop: unity }
-    - { role: gantsign.lightdm, lightdm_autologin_user: vagrant }
+    - role: geerlingguy.nfs
+    - role: geerlingguy.packer-debian
+    - role: tersmitten.locales
+      locales_present:
+        - en_US.UTF-8
+        - de_DE.UTF-8
+      locales_language_packs_present:
+        - language-pack-en
+        - language-pack-en-base
+        - language-pack-de
+        - language-pack-de-base
+      locales_default:
+        lang: de_DE.UTF-8
+        # language: de_DE.UTF-8
+    - role: tersmitten.timezone
+      timezone_zone: "Etc/UTC"
+    - role: gantsign.keyboard
+      keyboard_model: pc105
+      keyboard_layout: de
+    - role: cmprescott.dnsmasq
+      dnsmasq_dns_interfaces: []
+    - role: toopy.lxc-dev
+      lxc_config_path: "/var/lib/lxc/"
+    - role: tersmitten.pip
+    - role: tersmitten.virtualenv
+    - role: tersmitten.ansible
+      tags:
+        - ansible
+    - role: gantsign.xdesktop
+      xdesktop_desktop: unity
+    - role: gantsign.lightdm
+      lightdm_autologin_user: vagrant
 
   tasks:
     - name: "Install needed packages"

@@ -56,7 +56,7 @@
                 "<enter><wait>"
             ],
             "boot_wait": "10s",
-            "disk_size": 81920,
+            "disk_size": "{{user `disk_size`}}",
             "guest_os_type": "Ubuntu_64",
             "headless": false,
             "http_directory": "http",
@@ -108,7 +108,7 @@
                 "<enter><wait>"
             ],
             "boot_wait": "10s",
-            "disk_size": 81920,
+            "disk_size": "{{user `disk_size`}}",
             "guest_os_type": "ubuntu-64",
             "headless": true,
             "http_directory": "http",
@@ -146,6 +146,7 @@
         "memory": "2048",
         "cpus": "2",
         "desktop": "false",
-        "ansible_skip_tags": "ansible,testing"
+        "ansible_skip_tags": "ansible,testing",
+        "disk_size": 81920
     }
 }

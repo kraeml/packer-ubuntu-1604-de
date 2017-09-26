@@ -4,6 +4,10 @@
 - src: geerlingguy.nodejs
 - src: geerlingguy.java
 - src: geerlingguy.ruby
+- src: geerlingguy.mysql
+- src: geerlingguy.nginx
+- src: geerlingguy.php
+- src: geerlingguy.php-mysql
 - src: tersmitten.locales
 - src: tersmitten.timezone
 - src: cmprescott.dnsmasq
@@ -16,7 +20,8 @@
 - src: tschifftner.firefox
 # - src: gantsign.java
 - src: arknoll.selenium
-- src: nicolai86.ansible-phantomjs
+- src: nicolai86.phantomjs
+- src: greendayonfire.mongodb
 # - src: franklinkim.environment
 # - src: rvm_io.ruby
 - src: cmprescott.chrome

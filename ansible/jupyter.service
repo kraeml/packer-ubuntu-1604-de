@@ -1,0 +1,19 @@
+[Unit]
+Description=Jupyter Notebook
+Wants=network.target
+
+[Service]
+Type=simple
+ExecStart="/usr/local/bin/jupyter-notebook --no-browser"
+Restart=on-failure
+Nice=5
+User=vagrant
+Group=vagrant
+Environment=PATH=/usr/bin:/usr/local/bin:/bin
+Environment=NODE_ENV=production
+WorkingDirectory=/home/vagrant/
+# Tag things in the log
+SyslogIdentifier=Jupyter-Notebook
+
+[Install]
+WantedBy=multi-user.target

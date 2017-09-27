@@ -19,6 +19,11 @@
             "destination": "/tmp/config.inc.php"
         },
         {
+            "type": "file",
+            "source": "./ansible/jupyter.service",
+            "destination": "/tmp/jupyter.service"
+        },
+        {
             "type": "ansible-local",
             "playbook_file": "ansible/main.yml",
             "galaxy_file": "requirements.yml",

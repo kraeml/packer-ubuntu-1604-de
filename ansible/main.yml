@@ -514,11 +514,6 @@
       tags:
         - db_mysql
 
-    - name: Debug playbook_dir
-      debug: msg="{{playbook_dir}}"
-      tags:
-        - db_mysql
-
     - name: Copy phpmyadmin config
       become: yes
       ignore_errors: true
@@ -530,3 +525,37 @@
         remote_src: true
       tags:
         - db_mysql
+
+    - name: Install jupyter
+      block:
+      - apt:
+            name: "{{item}}"
+        with_items:
+          - libncurses5-dev
+          - python-dev
+          - python3-dev
+          - python3-pip
+          - pandoc
+      - pip:
+            executable: pip3
+            name: "{{item}}"
+        with_items:
+          - jupyter
+          - readline
+          - ipyparallel
+          - bash_kernel
+          - ipython-sql
+      - command: /usr/bin/python3 -m bash_kernel.install
+      - command: jupyter nbextension enable --py --sys-prefix widgetsnbextension
+      - name: Copy jupyter config
+        become: yes
+        ignore_errors: true
+        copy:
+            src: "/tmp/jupyter.service"
+            dest: /lib/systemd/system/jupyter.service
+            owner: root
+            group: root
+            mode: 0644
+            remote_src: true
+      tags:
+        - jupyter

@@ -18,18 +18,18 @@
   name: gantsign.xdesktop
 - src: gantsign.terminator
 - src: tschifftner.firefox
-# - src: gantsign.java
+## - src: gantsign.java
 - src: arknoll.selenium
 - src: nicolai86.phantomjs
 - src: greendayonfire.mongodb
-# - src: franklinkim.environment
+## - src: franklinkim.environment
 # - src: rvm_io.ruby
 - src: cmprescott.chrome
 - src: gantsign.default-web-browser
 - src: gantsign.atom
 - src: gantsign.atom-packages
 - src: gantsign.golang
-- src: gantsign.oh-my-zsh
+#- src: gantsign.oh-my-zsh
 - src: tersmitten.pip
 - src: tersmitten.virtualenv
 - src: tersmitten.ansible

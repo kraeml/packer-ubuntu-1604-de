@@ -521,10 +521,12 @@
 
     - name: Copy phpmyadmin config
       become: yes
+      ignore_errors: true
       copy:
-        src: "{{playbook_dir}}/config.inc.php"
+        src: "/tmp/config.inc.php"
         dest: /var/www/html/phpmyadmin/config.inc.php
         owner: www-data
         group: www-data
+        remote_src: true
       tags:
         - db_mysql

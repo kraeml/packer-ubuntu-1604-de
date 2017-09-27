@@ -14,6 +14,11 @@
             "script": "scripts/setup.sh"
         },
         {
+            "type": "file",
+            "source": "./ansible/config.inc.php",
+            "destination": "/tmp/config.inc.php"
+        },
+        {
             "type": "ansible-local",
             "playbook_file": "ansible/main.yml",
             "galaxy_file": "requirements.yml",

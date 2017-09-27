@@ -147,6 +147,6 @@
         "cpus": "2",
         "desktop": "false",
         "ansible_skip_tags": "ansible,testing",
-        "disk_size": 81920
+        "disk_size": "81920"
     }
 }

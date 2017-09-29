@@ -547,9 +547,11 @@
           - ipython-sql
       - command: /usr/bin/python3 -m bash_kernel.install
       - command: jupyter nbextension enable --py --sys-prefix widgetsnbextension
+      - shell: chmod u+x /tmp/configure_jupyter.sh && /tmp/configure_jupyter.sh
+        become: yes
+        become_user: vagrant
       - name: Copy jupyter config
         become: yes
-        ignore_errors: true
         copy:
             src: "/tmp/jupyter.service"
             dest: /lib/systemd/system/jupyter.service
@@ -557,5 +559,22 @@
             group: root
             mode: 0644
             remote_src: true
+      - name: Enable Jupyter
+        become: yes
+        service:
+            name: jupyter
+            enabled: yes
+      - name: Install js kernel
+        become: yes
+        npm:
+            global: yes
+            name: ijavascript
+      - shell: ijsinstall --install=global
+        become: yes
+      - name: Restart Jupyter
+        become: yes
+        service:
+            name: jupyter
+            state: restarted
       tags:
         - jupyter

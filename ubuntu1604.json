@@ -24,6 +24,11 @@
             "destination": "/tmp/jupyter.service"
         },
         {
+            "type": "file",
+            "source": "./ansible/configure_jupyter.sh",
+            "destination": "/tmp/configure_jupyter.sh"
+        },
+        {
             "type": "ansible-local",
             "playbook_file": "ansible/main.yml",
             "galaxy_file": "requirements.yml",

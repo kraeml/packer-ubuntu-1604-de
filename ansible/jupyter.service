@@ -4,7 +4,7 @@ Wants=network.target
 
 [Service]
 Type=simple
-ExecStart="/usr/local/bin/jupyter-notebook --no-browser"
+ExecStart="/usr/local/bin/jupyter-notebook"
 Restart=on-failure
 Nice=5
 User=vagrant

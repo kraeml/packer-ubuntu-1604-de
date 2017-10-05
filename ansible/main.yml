@@ -38,6 +38,22 @@
       keyboard_layout: de
       tags:
         - locale_de
+
+    # Install and configure Git version control
+    - role: franklinkim.git
+      become: yes
+      git_config:
+        core:
+          autocrlf: input
+        alias:
+          ls: 'log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate'
+          ll: 'log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat'
+          lds: 'log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short'
+          lt: 'log --oneline --graph --decorate --all'
+          cane: 'git commit --amend --no-edit'
+          rom: 'rebase origin/master'
+      tags:
+        - git
     # Add lcx development
     - role: cmprescott.dnsmasq
       dnsmasq_dns_interfaces: []
@@ -339,6 +355,26 @@
       tags:
         - no_sql
 
+    # Install Docker
+    - role: angstwad.docker_ubuntu
+      tags:
+        - docker
+      docker_group_members:
+        - vagrant
+
+    # Install Kubernetes
+    - role: gantsign.kubernetes
+      tags:
+        - kubernetes
+        - docker
+      kubernetes_node_type: admin
+
+    # Install Molecule for testing Ansible roles & playbooks
+    - role: gantsign.molecule
+      tags:
+        - docker
+        - molecule
+
   tasks:
     - name: "Install needed packages"
       apt:
@@ -354,16 +390,21 @@
         - vim
         - screen
         - htop
+        - tree
         - sqlite
         - lvm2
         - python3
         - python3-pip
         - python3-virtualenv
         - python3-dev
+        - python3-pexpect
+        - python-pexpect
         - libffi-dev
         - libssl-dev
         - cowsay
         - sshpass
+        - avahi-daemon
+        - avahi-utils
 
     - name: "Install lxc-dev needed packages"
       apt:
@@ -443,10 +484,11 @@
       become: yes
       become_user: vagrant
       file:
-        path: "/home/vagrant/{{item}}"
+        path: "/home/vagrant/rdf/{{item}}"
         state: directory
         owner: vagrant
         group: vagrant
+        recurse: yes
       with_items:
         - ais
         - bsa
@@ -484,13 +526,19 @@
       become_user: vagrant
       become: yes
       git:
-        dest: /home/vagrant/ais/hands-on-ansible
+        dest: "/home/vagrant/rdf/{{item.path}}/hands-on-ansible"
         force: yes
-        recursive: yes
-        repo: https://github.com/kraeml/hands-on-ansible.git
-        version: master
+        repo: "https://github.com/kraeml/{{item.repo}}.git"
+        version: "{{item.version}}"
+      with_items:
+        - repo: hands-on-ansible
+          path: ais
+          version: master
+        - repo: hands-on-bsa
+          path: bsa
+          version: master
       tags:
-        - lxc-dev
+        - rdf
 
     - name: Install phpmyadmin
       vars:

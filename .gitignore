@@ -3,3 +3,4 @@ packer_cache/*
 iso/*
 .vagrant/*
 ansible/main.retry
+output-virtualbox-iso

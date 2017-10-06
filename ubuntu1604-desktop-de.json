@@ -13,7 +13,7 @@
     "memory": "2048",
     "preseed": "preseed.cfg",
     "update": "true",
-    "vagrantfile_template": "tpl/vagrantfile-ubuntu1604-desktop.tpl",
+    "vagrantfile_template": "Vagrantfile.template",
     "hostname": "ubuntu-de",
     "ansible_skip_tags": "ansible,testing"
 }

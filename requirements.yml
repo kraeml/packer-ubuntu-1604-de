@@ -34,10 +34,7 @@
 - src: tersmitten.virtualenv
 - src: tersmitten.ansible
 - src: angstwad.docker_ubuntu
-  version: 'v2.5.2'
 - src: gantsign.kubernetes
-  version: '1.0.0'
 - src: gantsign.molecule
-  version: '3.0.0'
 - src: franklinkim.git
-  version: '1.2.2'
+- src: wtanaka.vagrant

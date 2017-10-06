@@ -212,6 +212,7 @@
       ruby_download_url: "http://cache.ruby-lang.org/pub/ruby/2.4/ruby-{{ruby_version}}.tar.gz"
       ruby_install_gems:
         - inspec
+        - serverpec
         - capybara
         - selenium-webdriver
         - cucumber
@@ -221,6 +222,18 @@
         - rspec-expectations
         - launchy
         - rest-client
+        - test-kitchen
+        - kitchen-ansible
+        - kitchen-salt
+        - kitchen-vagrant
+        - kitchen-docker
+        - kitchen-sync
+        - kitchen-verifier-serverspec
+        - kitchen-lxc
+        - kitchen-inspec
+        - fog
+        - foodcritic
+        - thor-foodcritic
       tags:
         - ruby
 
@@ -371,9 +384,14 @@
 
     # Install Molecule for testing Ansible roles & playbooks
     - role: gantsign.molecule
+      molecule_version: '2.2.0'
       tags:
         - docker
         - molecule
+
+    - role: wtanaka.vagrant
+      vagrant_url: "https://releases.hashicorp.com/vagrant/2.0.0/vagrant_2.0.0_x86_64.deb"
+
 
   tasks:
     - name: "Install needed packages"

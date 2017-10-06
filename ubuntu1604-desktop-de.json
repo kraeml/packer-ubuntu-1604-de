@@ -15,5 +15,6 @@
     "update": "true",
     "vagrantfile_template": "Vagrantfile.template",
     "hostname": "rdf-dev",
-    "ansible_skip_tags": "ansible,testing"
+    "ansible_skip_tags": "ansible,testing",
+    "cloud_name": "ubuntu1604-desktop-de"
 }

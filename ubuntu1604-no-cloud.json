@@ -151,16 +151,9 @@
     ],
     "post-processors": [
         {
-            "keep_input_artifact": false,
             "output": "builds/{{.Provider}}-ubuntu1604-{{user `version`}}.box",
             "type": "vagrant",
             "vagrantfile_template": "{{ user `vagrantfile_template` }}"
-        },
-        {
-            "type": "vagrant-cloud",
-            "box_tag": "kraeml/{{ user `cloude_name` }}",
-            "access_token": "{{user `cloud_token`}}",
-            "version": "{{user `version`}}"
         }
     ],
     "variables": {
@@ -171,7 +164,6 @@
         "desktop": "false",
         "ansible_skip_tags": "ansible,testing",
         "disk_size": "81920",
-        "vagrantfile_template": "Vagrantfile.template",
-        "cloud_name": "ubuntu1604-de"
+        "vagrantfile_template": "Vagrantfile.template"
     }
 }

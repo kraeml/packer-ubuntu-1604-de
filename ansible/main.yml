@@ -511,7 +511,7 @@
         - ais
         - bsa
         - itec
-        - ins
+        - ina
       tags:
         - rdf
 
@@ -544,7 +544,7 @@
       become_user: vagrant
       become: yes
       git:
-        dest: "/home/vagrant/rdf/{{item.path}}/hands-on-ansible"
+        dest: "/home/vagrant/rdf/{{item.path}}/{{item.repo}}"
         force: yes
         repo: "https://github.com/kraeml/{{item.repo}}.git"
         version: "{{item.version}}"
@@ -594,7 +594,8 @@
 
     - name: Install jupyter
       block:
-      - apt:
+      - name: jupyter packages
+        apt:
             name: "{{item}}"
         with_items:
           - libncurses5-dev
@@ -602,7 +603,8 @@
           - python3-dev
           - python3-pip
           - pandoc
-      - pip:
+      - name: jupyter via pip
+        pip:
             executable: pip3
             name: "{{item}}"
         with_items:
@@ -611,9 +613,12 @@
           - ipyparallel
           - bash_kernel
           - ipython-sql
-      - command: /usr/bin/python3 -m bash_kernel.install
-      - command: jupyter nbextension enable --py --sys-prefix widgetsnbextension
-      - shell: chmod u+x /tmp/configure_jupyter.sh && /tmp/configure_jupyter.sh
+      - name: Insall bash kernel
+        command: /usr/bin/python3 -m bash_kernel.install
+      - name: Enable jupyter widgetsnbextension
+        command: jupyter nbextension enable --py --sys-prefix widgetsnbextension
+      - name: Ensure config is executable
+        shell: chmod u+x /tmp/configure_jupyter.sh && /tmp/configure_jupyter.sh
         become: yes
         become_user: vagrant
       - name: Copy jupyter config
@@ -635,7 +640,8 @@
         npm:
             global: yes
             name: ijavascript
-      - shell: ijsinstall --install=global
+      - name: Install javascript kernel
+        command: ijsinstall --install=global
         become: yes
       - name: Restart Jupyter
         become: yes

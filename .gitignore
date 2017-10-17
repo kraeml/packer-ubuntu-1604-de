@@ -4,3 +4,4 @@ iso/*
 .vagrant/*
 ansible/main.retry
 output-virtualbox-iso
+downloads/

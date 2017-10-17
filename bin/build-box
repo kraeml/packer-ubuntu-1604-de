@@ -50,4 +50,4 @@ args "$@"
 
 version=$(cat VERSION)
 packer build ${only} -var-file=${var_file} -var "version=${version}" ${packer_template}
-sed -i s/virtualbox-ubuntu1604-.*\.box/virtualbox-ubuntu1604-$(cat VERSION).box/g Vagrantfile  
+sed -i s/virtualbox-ubuntu1604-.*\.box/virtualbox-ubuntu1604-$(cat VERSION).box/g Vagrantfile

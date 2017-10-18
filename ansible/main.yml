@@ -169,6 +169,14 @@
             - intentions
             - atom-beautify
             - file-icons
+            - atom-ide-ui
+            - ide-typescript
+            - ide-json
+            - ide-yaml
+            - ide-css
+            - ide-html
+            - ide-python
+            - atom-jinja2
           atom_config:
             "*":
               core:

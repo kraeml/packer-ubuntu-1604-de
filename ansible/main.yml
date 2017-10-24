@@ -24,7 +24,11 @@
 
   roles:
     - role: geerlingguy.nfs
+      tags:
+        - packer
     - role: geerlingguy.packer-debian
+      tags:
+        - packer
     - role: tersmitten.locales
       locales_present:
         - en_US.UTF-8
@@ -184,6 +188,8 @@
             - ide-html
             - ide-python
             - atom-jinja2
+            - autocomplete-ansible
+            - linter-ansible-linting
           atom_config:
             "*":
               core:
@@ -449,7 +455,7 @@
       with_items:
         - yum
         - rpm
-        - zypper
+        # - zypper
         - qemu-user-static
       tags:
         - lxc-dev
@@ -473,6 +479,7 @@
         - hunspell-en-ca
         - wamerican
         - hunspell-en-gb
+        - file-roller
       tags:
         - desktop
 
@@ -495,6 +502,33 @@
       with_items: "{{lxc_templates}}"
       tags:
         - lxc-dev
+
+    - name: pull an docker images
+      docker_image:
+        name: "{{item}}"
+      with_items:
+        - gitlab/gitlab-ce
+      tags:
+        - docker
+
+    - name: Start gitlab container
+      docker_container:
+        name: gitlab
+        hostname: gitlab.rdf-dev
+        image: gitlab/gitlab-ce
+        state: started
+        detach: yes
+        restart_policy: always
+        ports:
+          - "8443:443"
+          - "8080:80"
+          - "2222:22"
+        volumes:
+          - /vagrant/gitlab/config:/etc/gitlab
+          - /vagrant/gitlab/logs:/var/log/gitlab
+          - /vagrant/gitlab/data:/var/opt/gitlab
+      tags:
+         - docker
 
     - name: configure screen
       lineinfile:
@@ -624,8 +658,20 @@
         dest: /var/www/html/phpmyadmin/config.inc.php
         owner: www-data
         group: www-data
+        mode: 0664
       tags:
         - db_mysql
+
+    - name: Get RDF files
+      become: yes
+      get_url:
+          dest: "/home/vagrant/rdf/{{item.dest}}"
+          url: "{{item.url}}"
+          owner: vagrant
+          group: vagrant
+      with_items:
+        - url: https://cloud.franken.de/owncloud/index.php/s/Bg6uuMolM5SJha0/download
+          dest: bsa/
 
     - name: Install jupyter
       block:
@@ -653,14 +699,16 @@
       - name: Enable jupyter widgetsnbextension
         command: jupyter nbextension enable --py --sys-prefix widgetsnbextension
       - name: Get jupyter config script
-        become: yes
-        become_user: vagrant
         get_url:
             dest: /tmp/configure_jupyter.sh
             url: https://cloud.franken.de/owncloud/index.php/s/I6Vs9u803LAQZ9R/download
-            mode: 0664
-      - name: Ensure config is executable
-        shell: /tmp/configure_jupyter.sh
+            owner: vagrant
+            group: vagrant
+            mode: 0774
+      - name: Ensure jupyter config is set
+        script: /tmp/configure_jupyter.sh
+        args:
+            creates: /home/vagrant/.jupyter/jupyter_notebook_config.py
         become: yes
         become_user: vagrant
       - name: Copy jupyter config
@@ -671,7 +719,6 @@
             owner: root
             group: root
             mode: 0644
-            remote_src: true
       - name: Enable Jupyter
         become: yes
         service:

@@ -672,6 +672,8 @@
       with_items:
         - url: https://cloud.franken.de/owncloud/index.php/s/Bg6uuMolM5SJha0/download
           dest: bsa/
+        - url: https://cloud.franken.de/owncloud/index.php/s/C0oBcCf7q4ODsPd/download
+          dest: itec/
 
     - name: Install jupyter
       block:

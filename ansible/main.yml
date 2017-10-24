@@ -11,10 +11,24 @@
       - alpine
       - centos
       - fedora
+    - db_user:
+        name: "example_user"
+        password: "passw0rd"
+    - package_version:
+        nodejs_version: 6.x
+        phantomjs_version: "2.1.1"
+        ruby_version: 2.4.2
+        molecule_version: '2.3.1'
+        vagrant: 2.0.0
+        phpmyadmin: "4.7.4"
 
   roles:
     - role: geerlingguy.nfs
+      tags:
+        - packer
     - role: geerlingguy.packer-debian
+      tags:
+        - packer
     - role: tersmitten.locales
       locales_present:
         - en_US.UTF-8
@@ -65,7 +79,7 @@
         - lxc-dev
     # Add Node.js
     - role: geerlingguy.nodejs
-      nodejs_version: 6.x
+      nodejs_version: "{{package_version.nodejs_version}}"
       nodejs_install_npm_user: vagrant
       nodejs_npm_global_packages:
         - name: grunt-cli
@@ -146,7 +160,7 @@
       tags:
         - web-dev
         #
-      phantomjs_version: "2.1.1"
+      phantomjs_version: "{{package_version.phantomjs_version}}"
       phantomjs_url: "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-{{phantomjs_version}}-linux-x86_64.tar.bz2"
 
     #
@@ -166,6 +180,16 @@
             - intentions
             - atom-beautify
             - file-icons
+            - atom-ide-ui
+            - ide-typescript
+            - ide-json
+            - ide-yaml
+            - ide-css
+            - ide-html
+            - ide-python
+            - atom-jinja2
+            - autocomplete-ansible
+            - linter-ansible-linting
           atom_config:
             "*":
               core:
@@ -208,7 +232,7 @@
       become: yes
       ruby_install_gems_user: vagrant
       ruby_install_from_source: true
-      ruby_version: 2.4.2
+      ruby_version: "{{package_version.ruby_version}}"
       ruby_download_url: "http://cache.ruby-lang.org/pub/ruby/2.4/ruby-{{ruby_version}}.tar.gz"
       ruby_install_gems:
         - inspec
@@ -277,9 +301,9 @@
         encoding: latin1
         collation: latin1_general_ci
       mysql_users:
-      - name: example_user
+      - name: "{{db_user.name}}"
         host: "%"
-        password: passw0rd
+        password: "{{db_user.password}}"
         priv: "example_db.*:ALL"
       tags:
         - db_mysql
@@ -361,8 +385,8 @@
     - role: greendayonfire.mongodb
       mongodb_security_authorization: "enabled"
       mongodb_users:
-      - name: example_user
-        password: passw0rd
+      - name: "{{db_user.name}}"
+        password: "{{db_user.password}}"
         roles: readWrite
         database: app_development
       tags:
@@ -384,13 +408,13 @@
 
     # Install Molecule for testing Ansible roles & playbooks
     - role: gantsign.molecule
-      molecule_version: '2.2.0'
+      molecule_version: "{{package_version.molecule_version}}"
       tags:
         - docker
         - molecule
 
     - role: wtanaka.vagrant
-      vagrant_url: "https://releases.hashicorp.com/vagrant/2.0.0/vagrant_2.0.0_x86_64.deb"
+      vagrant_url: "https://releases.hashicorp.com/vagrant/{{package_version.vagrant}}/vagrant_{{package_version.vagrant}}_x86_64.deb"
 
 
   tasks:
@@ -431,7 +455,7 @@
       with_items:
         - yum
         - rpm
-        - zypper
+        # - zypper
         - qemu-user-static
       tags:
         - lxc-dev
@@ -455,6 +479,7 @@
         - hunspell-en-ca
         - wamerican
         - hunspell-en-gb
+        - file-roller
       tags:
         - desktop
 
@@ -477,6 +502,33 @@
       with_items: "{{lxc_templates}}"
       tags:
         - lxc-dev
+
+    - name: pull an docker images
+      docker_image:
+        name: "{{item}}"
+      with_items:
+        - gitlab/gitlab-ce
+      tags:
+        - docker
+
+    - name: Start gitlab container
+      docker_container:
+        name: gitlab
+        hostname: gitlab.rdf-dev
+        image: gitlab/gitlab-ce
+        state: started
+        detach: yes
+        restart_policy: always
+        ports:
+          - "8443:443"
+          - "8080:80"
+          - "2222:22"
+        volumes:
+          - /vagrant/gitlab/config:/etc/gitlab
+          - /vagrant/gitlab/logs:/var/log/gitlab
+          - /vagrant/gitlab/data:/var/opt/gitlab
+      tags:
+         - docker
 
     - name: configure screen
       lineinfile:
@@ -558,9 +610,27 @@
       tags:
         - rdf
 
+    - name: OWC File Transfer
+      become: yes
+      become_user: vagrant
+      unarchive:
+          dest: "/home/vagrant/rdf/ina/"
+          src: https://cloud.franken.de/owncloud/index.php/s/j0vW45mnASmJCFk/download
+          creates: /home/vagrant/rdf/ina/hands-on-ina
+          remote_src: yes
+          exclude: ".git"
+          keep_newer: yes
+          owner: vagrant
+          group: vagrant
+      with_items:
+        - src: /tmp/hands-on-ina
+          path: ina/hands-on-ina
+      tags:
+        - rdf
+
     - name: Install phpmyadmin
       vars:
-        version: "4.7.4"
+        version: "{{package_version.phpmyadmin}}"
       unarchive:
         src: https://files.phpmyadmin.net/phpMyAdmin/{{version}}/phpMyAdmin-{{version}}-all-languages.tar.gz
         dest: /var/www/html/
@@ -572,7 +642,7 @@
 
     - name: Link to phpmyadmin
       vars:
-         version: "4.7.4"
+         version: "{{package_version.phpmyadmin}}"
       file:
         state: link
         src: /var/www/html/phpMyAdmin-{{version}}-all-languages
@@ -583,14 +653,25 @@
     - name: Copy phpmyadmin config
       become: yes
       ignore_errors: true
-      copy:
-        src: "/tmp/config.inc.php"
+      get_url:
+        url: https://cloud.franken.de/owncloud/index.php/s/zPpINpJHLXwSb0u/download
         dest: /var/www/html/phpmyadmin/config.inc.php
         owner: www-data
         group: www-data
-        remote_src: true
+        mode: 0664
       tags:
         - db_mysql
+
+    - name: Get RDF files
+      become: yes
+      get_url:
+          dest: "/home/vagrant/rdf/{{item.dest}}"
+          url: "{{item.url}}"
+          owner: vagrant
+          group: vagrant
+      with_items:
+        - url: https://cloud.franken.de/owncloud/index.php/s/Bg6uuMolM5SJha0/download
+          dest: bsa/
 
     - name: Install jupyter
       block:
@@ -617,19 +698,27 @@
         command: /usr/bin/python3 -m bash_kernel.install
       - name: Enable jupyter widgetsnbextension
         command: jupyter nbextension enable --py --sys-prefix widgetsnbextension
-      - name: Ensure config is executable
-        shell: chmod u+x /tmp/configure_jupyter.sh && /tmp/configure_jupyter.sh
+      - name: Get jupyter config script
+        get_url:
+            dest: /tmp/configure_jupyter.sh
+            url: https://cloud.franken.de/owncloud/index.php/s/I6Vs9u803LAQZ9R/download
+            owner: vagrant
+            group: vagrant
+            mode: 0774
+      - name: Ensure jupyter config is set
+        script: /tmp/configure_jupyter.sh
+        args:
+            creates: /home/vagrant/.jupyter/jupyter_notebook_config.py
         become: yes
         become_user: vagrant
       - name: Copy jupyter config
         become: yes
-        copy:
-            src: "/tmp/jupyter.service"
+        get_url:
+            url: https://cloud.franken.de/owncloud/index.php/s/xSQvKOHH64Z0W45/download
             dest: /lib/systemd/system/jupyter.service
             owner: root
             group: root
             mode: 0644
-            remote_src: true
       - name: Enable Jupyter
         become: yes
         service:

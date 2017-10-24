@@ -14,21 +14,6 @@
             "script": "scripts/setup.sh"
         },
         {
-            "type": "file",
-            "source": "./ansible/config.inc.php",
-            "destination": "/tmp/config.inc.php"
-        },
-        {
-            "type": "file",
-            "source": "./ansible/jupyter.service",
-            "destination": "/tmp/jupyter.service"
-        },
-        {
-            "type": "file",
-            "source": "./ansible/configure_jupyter.sh",
-            "destination": "/tmp/configure_jupyter.sh"
-        },
-        {
             "type": "ansible-local",
             "playbook_file": "ansible/main.yml",
             "galaxy_file": "requirements.yml",

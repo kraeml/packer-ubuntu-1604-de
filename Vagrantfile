@@ -8,7 +8,7 @@ Vagrant.configure("2") do |config|
   # `vagrant up vmware --provider=vmware_fusion`
 #  config.vm.define "vmware" do |vmware|
 #    vmware.vm.hostname = "rdf-dev"
-#    vmware.vm.box = "file://builds/virtualbox-ubuntu1604-17.10.17-14.box"
+#    vmware.vm.box = "file://builds/virtualbox-ubuntu1604-17.10.23-15.box"
 #    vmware.vm.network :private_network, ip: "192.168.3.2"
 #
 #    config.vm.provider :vmware_fusion do |v, override|
@@ -24,7 +24,7 @@ Vagrant.configure("2") do |config|
   # `vagrant up virtualbox --provider=virtualbox`
   config.vm.define "virtualbox" do |virtualbox|
     virtualbox.vm.hostname = "rdf-dev"
-    virtualbox.vm.box = "file://builds/virtualbox-ubuntu1604-17.10.17-14.box"
+    virtualbox.vm.box = "file://builds/virtualbox-ubuntu1604-17.10.23-15.box"
     virtualbox.vm.network :private_network, ip: "172.22.3.2"
 
     config.vm.provider :virtualbox do |v|

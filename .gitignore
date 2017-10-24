@@ -5,3 +5,4 @@ iso/*
 ansible/main.retry
 output-virtualbox-iso
 downloads/
+gitlab/

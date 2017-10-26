@@ -529,6 +529,7 @@
           - /vagrant/gitlab/data:/var/opt/gitlab
       tags:
          - docker
+         - testing
 
     - name: configure screen
       lineinfile:

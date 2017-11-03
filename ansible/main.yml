@@ -441,12 +441,15 @@
         - python3-dev
         - python3-pexpect
         - python-pexpect
+        - python3-winrm
+        - python-winrm
         - libffi-dev
         - libssl-dev
         - cowsay
         - sshpass
         - avahi-daemon
         - avahi-utils
+        - nmap
 
     - name: "Install lxc-dev needed packages"
       apt:

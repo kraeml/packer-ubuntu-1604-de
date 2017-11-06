@@ -48,12 +48,13 @@ args() {
 # main
 args "$@"
 
-version=$(cat VERSION)
 rm -rf gitlab || true
 bin/bump.sh patch || true
+version=$(cat VERSION)
 packer build ${only} -var-file=${var_file} -var "version=${version}" ${packer_template}
 sed -i s/virtualbox-ubuntu1604-.*\.box/virtualbox-ubuntu1604-$(cat VERSION).box/g Vagrantfile
 #git add .
 git commit -am "Create $(cat VERSION)"
 git flow release start $(cat VERSION)
-echo "Run now git flow release finish $(cat VERSION) and git push --all git push --tags"
+echo "Run now:"
+echo "      git flow release finish && $(cat VERSION) && git push --all && git push --tags"

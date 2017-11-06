@@ -20,7 +20,7 @@ Vagrant.configure("2") do |config|
   end
   config.vm.define "win" do |win|
       win.vm.define "vagrant-windows-2016"
-      win.vm.box = "file://builds/windows_2016_virtualbox.box"
+      win.vm.box = "file://builds/windows_2016_hyperv_virtualbox.box"
       win.vm.communicator = "winrm"
 
       # Admin user name and password

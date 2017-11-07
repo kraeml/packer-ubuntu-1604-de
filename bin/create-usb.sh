@@ -13,7 +13,7 @@ for i in  $(ls -d /media/michl/PR_*); do
     rm !($BOX_VERSION) || true
     cd -
     rsync -av ./builds/${BOX_VERSION}  ${i}/builds/;
-    rsync -av ./builds/windows_2016_hyperv_virualbox.box  ${i}/builds/;
+    rsync -av ./builds/windows_2016_hyperv_virtualbox.box  ${i}/builds/;
     # rsync -av ./builds/windows_2016_hyperv_virualbox.box  ${i}/builds/;
     rsync -av ./Vagrantfile ${i}/
     rsync -av --human-readable --ignore-errors --delete ./downloads/ ${i}/downloads/

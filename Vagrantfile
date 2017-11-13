@@ -33,6 +33,8 @@ Vagrant.configure("2") do |config|
       win.vm.network :forwarded_port, guest: 3389, host: 3389, id: "rdp", auto_correct: true
       win.vm.network :forwarded_port, guest: 22, host: 2222, id: "ssh", auto_correct: true
       win.vm.network :private_network, ip: "172.22.3.3"
+      win.vm.provision "shell",
+        inline: "Set-Item WSMan:\\localhost\\Client\\TrustedHosts -Value '172.22.3.2' -Concatenate -Force"
 
 
       win.vm.provider :virtualbox do |v, override|

@@ -190,6 +190,7 @@
             - atom-jinja2
             - autocomplete-ansible
             - linter-ansible-linting
+            - terminal-fusion
           atom_config:
             "*":
               core:

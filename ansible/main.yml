@@ -190,6 +190,7 @@
             - atom-jinja2
             - autocomplete-ansible
             - linter-ansible-linting
+            - platformio-ide-terminal
           atom_config:
             "*":
               core:

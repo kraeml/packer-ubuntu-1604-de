@@ -616,6 +616,9 @@
         - repo: hands-on-bsa
           path: bsa
           version: master
+        - repo: python_routine_aufgaben
+          bath: itec
+          version: master
       tags:
         - rdf
 
@@ -671,7 +674,7 @@
       tags:
         - db_mysql
 
-    - name: Get RDF files
+    - name: Get RDF files from owncloud
       become: yes
       get_url:
           dest: "/home/vagrant/rdf/{{item.dest}}"

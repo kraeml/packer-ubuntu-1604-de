@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+BUILD="${PR:="RDF"}"
 set -o errexit -o nounset -o pipefail
 
 if [ "${DEBUG:=false}" = "true" ]; then
@@ -50,11 +51,12 @@ args "$@"
 
 rm -rf gitlab || true
 bin/bump.sh patch || true
-version=$(cat VERSION)
+version=${BUILD}-$(cat VERSION)
 packer build ${only} -var-file=${var_file} -var "version=${version}" ${packer_template}
-sed -i s/virtualbox-ubuntu1604-.*\.box/virtualbox-ubuntu1604-$(cat VERSION).box/g Vagrantfile
+sed -i s/virtualbox-ubuntu1604-.*\.box/virtualbox-ubuntu1604-${version}.box/g Vagrantfile
+cp Vagrantfile builds/Vagrantfile.${version}
 #git add .
-git commit -am "Create $(cat VERSION)"
-git flow release start $(cat VERSION)
+git commit -am "Create ${version}"
+git flow release start ${version}
 echo "Run now:"
-echo "      git flow release finish $(cat VERSION) && git push --all && git push --tags"
+echo "      git flow release finish ${version} && git push --all && git push --tags"

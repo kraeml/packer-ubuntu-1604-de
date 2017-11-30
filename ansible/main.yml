@@ -710,6 +710,10 @@
           - ipyparallel
           - bash_kernel
           - ipython-sql
+          - ihtml
+          - ExpectException
+          - RISE
+
       - name: Insall bash kernel
         command: /usr/bin/python3 -m bash_kernel.install
       - name: Enable jupyter widgetsnbextension
@@ -748,6 +752,19 @@
       - name: Install javascript kernel
         command: ijsinstall --install=global
         become: yes
+
+      - name: Ensure RISE installed
+        become: yes
+        command: jupyter-nbextension install rise --py --sys-prefix
+        args:
+          creates: /usr/local/share/jupyter/nbextensions/rise/
+        register: jupyter_rise
+
+      - name: Ensure RISE enabled
+        become: yes
+        command: jupyter-nbextension enable rise --py --sys-prefix
+        when: jupyter_rise.changed
+        
       - name: Restart Jupyter
         become: yes
         service:

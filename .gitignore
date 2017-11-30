@@ -1,8 +1,12 @@
 packer_cache/*
 *.box
 iso/*
-.vagrant/*
+*/.vagrant/*
+.vagrant
 ansible/main.retry
 output-virtualbox-iso
 downloads/
 gitlab/
+builds/*
+ka-sa-pr-build/
+media/

@@ -19,7 +19,7 @@
         phantomjs_version: "2.1.1"
         ruby_version: 2.4.2
         molecule_version: '2.3.1'
-        vagrant: 2.0.0
+        vagrant: 2.0.1
         phpmyadmin: "4.7.4"
 
   roles:
@@ -416,6 +416,8 @@
 
     - role: wtanaka.vagrant
       vagrant_url: "https://releases.hashicorp.com/vagrant/{{package_version.vagrant}}/vagrant_{{package_version.vagrant}}_x86_64.deb"
+      tags:
+        - vagrant
 
 
   tasks:
@@ -596,6 +598,8 @@
             name: "push.default",
             value: "simple"
         }
+      tags:
+        - git
 
     - name: Clone git
       become_user: vagrant
@@ -611,6 +615,9 @@
           version: master
         - repo: hands-on-bsa
           path: bsa
+          version: master
+        - repo: python_routine_aufgaben
+          bath: itec
           version: master
       tags:
         - rdf
@@ -667,7 +674,7 @@
       tags:
         - db_mysql
 
-    - name: Get RDF files
+    - name: Get RDF files from owncloud
       become: yes
       get_url:
           dest: "/home/vagrant/rdf/{{item.dest}}"
@@ -679,6 +686,8 @@
           dest: bsa/
         - url: https://cloud.franken.de/owncloud/index.php/s/C0oBcCf7q4ODsPd/download
           dest: itec/
+      tags:
+        - rdf
 
     - name: Install jupyter
       block:
@@ -701,6 +710,10 @@
           - ipyparallel
           - bash_kernel
           - ipython-sql
+          - ihtml
+          - ExpectException
+          - RISE
+
       - name: Insall bash kernel
         command: /usr/bin/python3 -m bash_kernel.install
       - name: Enable jupyter widgetsnbextension
@@ -739,6 +752,19 @@
       - name: Install javascript kernel
         command: ijsinstall --install=global
         become: yes
+
+      - name: Ensure RISE installed
+        become: yes
+        command: jupyter-nbextension install rise --py --sys-prefix
+        args:
+          creates: /usr/local/share/jupyter/nbextensions/rise/
+        register: jupyter_rise
+
+      - name: Ensure RISE enabled
+        become: yes
+        command: jupyter-nbextension enable rise --py --sys-prefix
+        when: jupyter_rise.changed
+        
       - name: Restart Jupyter
         become: yes
         service:

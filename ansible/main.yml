@@ -713,6 +713,7 @@
           - ihtml
           - ExpectException
           - RISE
+          - myhdl
 
       - name: Insall bash kernel
         command: /usr/bin/python3 -m bash_kernel.install

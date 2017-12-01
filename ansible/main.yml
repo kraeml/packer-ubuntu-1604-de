@@ -486,6 +486,8 @@
         - wamerican
         - hunspell-en-gb
         - file-roller
+        - gtkwave
+        - ghdl
       tags:
         - desktop
 

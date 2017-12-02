@@ -17,4 +17,4 @@ make-ka:
 
 test-ansible:
 	sudo ansible-galaxy install --role-file=requirements.yml
-	ansible-playbook -i localhost, -e ansible_connection=local --skip-tags=packer ansible/main.yml
+	ansible-playbook -i localhost, -e ansible_connection=local --skip-tags=packer --tags=testing ansible/main.yml

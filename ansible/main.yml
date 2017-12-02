@@ -125,6 +125,7 @@
     - role: tersmitten.ansible
       tags:
         - ansible
+        - not_packer
 
     - role: gantsign.xdesktop
       xdesktop_desktop: unity
@@ -395,10 +396,10 @@
 
     # Install Docker
     - role: angstwad.docker_ubuntu
-      tags:
-        - docker
       docker_group_members:
         - vagrant
+      tags:
+        - docker
 
     # Install Kubernetes
     - role: gantsign.kubernetes
@@ -425,6 +426,8 @@
       apt:
         name: "{{ item }}"
         state: installed
+        update_cache: yes
+        cache_valid_time: 3600
       with_items:
         - git
         - git-flow
@@ -454,128 +457,6 @@
         - avahi-utils
         - nmap
 
-    - name: "Install lxc-dev needed packages"
-      apt:
-        name: "{{ item }}"
-        state: installed
-      with_items:
-        - yum
-        - rpm
-        # - zypper
-        - qemu-user-static
-      tags:
-        - lxc-dev
-
-    - name: "Install desktop needed packages"
-      apt:
-        name: "{{ item }}"
-        state: installed
-      with_items:
-        - hunspell-de-ch
-        - wogerman
-        - hunspell-de-at
-        - hunspell-en-us
-        - wbritish
-        - hunspell-de-de
-        - language-pack-gnome-de
-        - wngerman
-        - hunspell-en-au
-        - wswiss
-        - hunspell-en-za
-        - hunspell-en-ca
-        - wamerican
-        - hunspell-en-gb
-        - file-roller
-        - gtkwave
-        - ghdl
-      tags:
-        - desktop
-
-    - name: Create a stopped container
-      lxc_container:
-        name: "{{container_prefix}}{{item}}"
-        container_log: true
-        template: "{{item}}"
-        state: stopped
-      with_items: "{{lxc_templates}}"
-      tags:
-        - lxc-dev
-
-    - name: Remove container
-      lxc_container:
-        name: "{{container_prefix}}{{item}}"
-        container_log: true
-        template: "{{item}}"
-        state: absent
-      with_items: "{{lxc_templates}}"
-      tags:
-        - lxc-dev
-
-    - name: pull an docker images
-      docker_image:
-        name: "{{item}}"
-      with_items:
-        - gitlab/gitlab-ce
-      tags:
-        - docker
-
-    - name: Start gitlab container
-      docker_container:
-        name: gitlab
-        hostname: gitlab.rdf-dev
-        image: gitlab/gitlab-ce
-        state: started
-        detach: yes
-        restart_policy: always
-        ports:
-          - "8443:443"
-          - "8080:80"
-          - "2222:22"
-        volumes:
-          - /vagrant/gitlab/config:/etc/gitlab
-          - /vagrant/gitlab/logs:/var/log/gitlab
-          - /vagrant/gitlab/data:/var/opt/gitlab
-      tags:
-         - docker
-         - testing
-
-    - name: configure screen
-      lineinfile:
-        path: /etc/screenrc
-        regexp: '^caption always'
-        line: 'caption always "%{rw} * | %H * $LOGNAME | %{bw}%c %D | %{-}%-Lw%{rw}%50>%{rW}%n%f* %t %{-}%+Lw%<"'
-      tags:
-        - rdf
-
-    - name: configure bashrc with screen
-      blockinfile:
-        path: /home/vagrant/.bashrc
-        block: |
-          if [ "$TERM" != "screen" ] && [ "$SSH_CONNECTION" != "" ]; then
-            /usr/bin/screen -ls sshscreen || /usr/bin/screen -dmS sshscreen
-            echo "SSH no active"
-            /usr/bin/screen -S sshscreen -D -RR  && exit
-          fi
-      tags:
-        - rdf
-
-    - name: Ensure rdf directories exists
-      become: yes
-      become_user: vagrant
-      file:
-        path: "/home/vagrant/rdf/{{item}}"
-        state: directory
-        owner: vagrant
-        group: vagrant
-        recurse: yes
-      with_items:
-        - ais
-        - bsa
-        - itec
-        - ina
-      tags:
-        - rdf
-
     - name: Git config
       become: yes
       become_user: vagrant
@@ -603,99 +484,260 @@
       tags:
         - git
 
-    - name: Clone git
-      become_user: vagrant
-      become: yes
+    - name: "Install lxc-dev needed packages"
+      apt:
+        name: "{{ item }}"
+        state: installed
+        update_cache: yes
+        cache_valid_time: 3600
+      with_items:
+        - yum
+        - rpm
+        # - zypper
+        - qemu-user-static
+      tags:
+        - lxc-dev
+
+    - name: "Install desktop needed packages"
+      apt:
+        name: "{{ item }}"
+        state: installed
+        update_cache: yes
+        cache_valid_time: 3600
+      with_items:
+        - hunspell-de-ch
+        - wogerman
+        - hunspell-de-at
+        - hunspell-en-us
+        - wbritish
+        - hunspell-de-de
+        - language-pack-gnome-de
+        - wngerman
+        - hunspell-en-au
+        - wswiss
+        - hunspell-en-za
+        - hunspell-en-ca
+        - wamerican
+        - hunspell-en-gb
+        - file-roller
+        - gtkwave
+        - gnat
+      tags:
+        - desktop
+        - ghdl
+
+    - name: Clone ghdl
       git:
-        dest: "/home/vagrant/rdf/{{item.path}}/{{item.repo}}"
-        force: yes
-        repo: "https://github.com/kraeml/{{item.repo}}.git"
-        version: "{{item.version}}"
-      with_items:
-        - repo: hands-on-ansible
-          path: ais
-          version: master
-        - repo: hands-on-bsa
-          path: bsa
-          version: master
-        - repo: python_routine_aufgaben
-          path: itec
-          version: master
+          dest: /tmp/ghdl
+          repo: https://github.com/tgingold/ghdl.git
+      register: ghdl_clone
       tags:
-        - rdf
+        - ghdl
 
-    - name: OWC File Transfer
-      become: yes
-      become_user: vagrant
-      unarchive:
-          dest: "/home/vagrant/rdf/ina/"
-          src: https://cloud.franken.de/owncloud/index.php/s/j0vW45mnASmJCFk/download
-          creates: /home/vagrant/rdf/ina/hands-on-ina
-          remote_src: yes
-          exclude: ".git"
-          keep_newer: yes
-          owner: vagrant
-          group: vagrant
-      with_items:
-        - src: /tmp/hands-on-ina
-          path: ina/hands-on-ina
-      tags:
-        - rdf
-
-    - name: Install phpmyadmin
-      vars:
-        version: "{{package_version.phpmyadmin}}"
-      unarchive:
-        src: https://files.phpmyadmin.net/phpMyAdmin/{{version}}/phpMyAdmin-{{version}}-all-languages.tar.gz
-        dest: /var/www/html/
-        owner: www-data
-        group: www-data
-        remote_src: yes
-      tags:
-        - db_mysql
-
-    - name: Link to phpmyadmin
-      vars:
-         version: "{{package_version.phpmyadmin}}"
+    - name: Create build in ghdl
       file:
-        state: link
-        src: /var/www/html/phpMyAdmin-{{version}}-all-languages
-        dest: /var/www/html/phpmyadmin
+          path: /tmp/ghdl/build
+          state: directory
+      when: ghdl_clone.changed
       tags:
-        - db_mysql
+        - ghdl
 
-    - name: Copy phpmyadmin config
-      become: yes
-      ignore_errors: true
-      get_url:
-        url: https://cloud.franken.de/owncloud/index.php/s/zPpINpJHLXwSb0u/download
-        dest: /var/www/html/phpmyadmin/config.inc.php
-        owner: www-data
-        group: www-data
-        mode: 0664
+    - name: Configure ghdl
+      command: ../configure --prefix=/opt/ghdl
+      args:
+          chdir: /tmp/ghdl/build
+      when: ghdl_clone.changed
       tags:
-        - db_mysql
+        - ghdl
 
-    - name: Get RDF files from owncloud
+    - name: Make ghdl
       become: yes
-      get_url:
-          dest: "/home/vagrant/rdf/{{item.dest}}"
-          url: "{{item.url}}"
-          owner: vagrant
-          group: vagrant
-      with_items:
-        - url: https://cloud.franken.de/owncloud/index.php/s/Bg6uuMolM5SJha0/download
-          dest: bsa/
-        - url: https://cloud.franken.de/owncloud/index.php/s/C0oBcCf7q4ODsPd/download
-          dest: itec/
+      command: '/bin/bash -l -c /usr/bin/make'
+      args:
+          chdir: /tmp/ghdl/build
+      when: ghdl_clone.changed
+      tags:
+        - ghdl
+
+    - name: Make install ghdl
+      become: yes
+      command: make install
+      args:
+          chdir: /tmp/ghdl/build
+      when: ghdl_clone.changed
+      tags:
+        - ghdl
+
+    - name: Create a stopped container
+      lxc_container:
+        name: "{{container_prefix}}{{item}}"
+        container_log: true
+        template: "{{item}}"
+        state: stopped
+      with_items: "{{lxc_templates}}"
+      tags:
+        - lxc-dev
+
+    - name: Remove container
+      lxc_container:
+        name: "{{container_prefix}}{{item}}"
+        container_log: true
+        template: "{{item}}"
+        state: absent
+      with_items: "{{lxc_templates}}"
+      tags:
+        - lxc-dev
+
+    - block:
+        - name: pull an docker images
+          docker_image:
+            name: "{{item}}"
+          with_items:
+            - gitlab/gitlab-ce
+
+        - name: Start gitlab container
+          docker_container:
+            name: gitlab
+            hostname: gitlab.rdf-dev
+            image: gitlab/gitlab-ce
+            state: started
+            detach: yes
+            restart_policy: always
+            ports:
+              - "8443:443"
+              - "8080:80"
+              - "2222:22"
+            volumes:
+              - /vagrant/gitlab/config:/etc/gitlab
+              - /vagrant/gitlab/logs:/var/log/gitlab
+              - /vagrant/gitlab/data:/var/opt/gitlab
+      tags:
+         - docker
+         - gitlab
+         - not_packer
+
+    - block:
+        - name: configure screen
+          lineinfile:
+            path: /etc/screenrc
+            regexp: '^caption always'
+            line: 'caption always "%{rw} * | %H * $LOGNAME | %{bw}%c %D | %{-}%-Lw%{rw}%50>%{rW}%n%f* %t %{-}%+Lw%<"'
+
+        - name: configure bashrc with screen
+          blockinfile:
+            path: /home/vagrant/.bashrc
+            block: |
+              if [ "$TERM" != "screen" ] && [ "$SSH_CONNECTION" != "" ]; then
+                /usr/bin/screen -ls sshscreen || /usr/bin/screen -dmS sshscreen
+                echo "SSH no active"
+                /usr/bin/screen -S sshscreen -D -RR  && exit
+              fi
+
+        - name: Ensure rdf directories exists
+          become: yes
+          become_user: vagrant
+          file:
+            path: "/home/vagrant/rdf/{{item}}"
+            state: directory
+            owner: vagrant
+            group: vagrant
+            recurse: yes
+          with_items:
+            - ais
+            - bsa
+            - itec
+            - ina
+
+        - name: Clone git for rdf
+          become_user: vagrant
+          become: yes
+          git:
+            dest: "/home/vagrant/rdf/{{item.path}}/{{item.repo}}"
+            force: yes
+            repo: "https://github.com/kraeml/{{item.repo}}.git"
+            version: "{{item.version}}"
+          with_items:
+            - repo: hands-on-ansible
+              path: ais
+              version: master
+            - repo: hands-on-bsa
+              path: bsa
+              version: master
+            - repo: python_routine_aufgaben
+              path: itec
+              version: master
+
+        - name: OWC File Transfer
+          become: yes
+          become_user: vagrant
+          unarchive:
+              dest: "/home/vagrant/rdf/ina/"
+              src: https://cloud.franken.de/owncloud/index.php/s/j0vW45mnASmJCFk/download
+              creates: /home/vagrant/rdf/ina/hands-on-ina
+              remote_src: yes
+              exclude: ".git"
+              keep_newer: yes
+              owner: vagrant
+              group: vagrant
+          with_items:
+            - src: /tmp/hands-on-ina
+              path: ina/hands-on-ina
+
+        - name: Get RDF files from owncloud
+          become: yes
+          become_user: vagrant
+          get_url:
+              dest: "/home/vagrant/rdf/{{item.dest}}"
+              url: "{{item.url}}"
+              owner: vagrant
+              group: vagrant
+          with_items:
+            - url: https://cloud.franken.de/owncloud/index.php/s/Bg6uuMolM5SJha0/download
+              dest: bsa/
+            - url: https://cloud.franken.de/owncloud/index.php/s/C0oBcCf7q4ODsPd/download
+              dest: itec/
       tags:
         - rdf
+
+    - block:
+        - name: Install phpmyadmin
+          vars:
+            version: "{{package_version.phpmyadmin}}"
+          unarchive:
+            src: https://files.phpmyadmin.net/phpMyAdmin/{{version}}/phpMyAdmin-{{version}}-all-languages.tar.gz
+            dest: /var/www/html/
+            owner: www-data
+            group: www-data
+            remote_src: yes
+
+        - name: Link to phpmyadmin
+          vars:
+             version: "{{package_version.phpmyadmin}}"
+          file:
+            state: link
+            src: /var/www/html/phpMyAdmin-{{version}}-all-languages
+            dest: /var/www/html/phpmyadmin
+
+        - name: Copy phpmyadmin config
+          become: yes
+          ignore_errors: true
+          get_url:
+            url: https://cloud.franken.de/owncloud/index.php/s/zPpINpJHLXwSb0u/download
+            dest: /var/www/html/phpmyadmin/config.inc.php
+            owner: www-data
+            group: www-data
+            mode: 0664
+      tags:
+        - db_mysql
+        - phpmyadmin
 
     - name: Install jupyter
       block:
       - name: jupyter packages
         apt:
             name: "{{item}}"
+            update_cache: yes
+            cache_valid_time: 3600
         with_items:
           - libncurses5-dev
           - python-dev

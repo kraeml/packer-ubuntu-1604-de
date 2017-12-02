@@ -10,3 +10,6 @@ gitlab/
 builds/*
 ka-sa-pr-build/
 media/
+Xilinx_ISE_DS_14.7_1015_1.tar
+Xilinx.lic
+ssh.config

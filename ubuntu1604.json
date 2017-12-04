@@ -155,7 +155,7 @@
         "memory": "2048",
         "cpus": "2",
         "desktop": "false",
-        "ansible_skip_tags": "ansible,testing",
+        "ansible_skip_tags": "ansible,not_packer",
         "disk_size": "81920",
         "vagrantfile_template": "Vagrantfile.template",
         "cloud_name": "ubuntu1604-de"

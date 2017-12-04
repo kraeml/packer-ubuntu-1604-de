@@ -14,3 +14,7 @@ make-ka:
 	mv ka-sa-pr-build/builds/Vagrantfile.KA* ka-sa-pr-build/Vagrantfile
 	mv ka-sa-pr-build/builds/Makefile.KA* ka-sa-pr-build/Makefile
 	sed -i 's/    /\t/g' ka-sa-pr-build/Makefile
+
+test-ansible:
+	sudo ansible-galaxy install --role-file=requirements.yml
+	ansible-playbook -i localhost, -e ansible_connection=local --skip-tags=packer --tags=testing ansible/main.yml

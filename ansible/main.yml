@@ -167,9 +167,6 @@
     #
     # Install Atom editor
     - role: gantsign.atom
-      tags:
-        - desktop
-        - atom
       users:
         - username: vagrant
           atom_packages:
@@ -192,6 +189,9 @@
             - autocomplete-ansible
             - linter-ansible-linting
             - platformio-ide-terminal
+            - platformio-ide
+            - platformio-ide-debugger
+            - platformio-ide-aia
           atom_config:
             "*":
               core:
@@ -199,6 +199,10 @@
               editor:
                 showIndentGuide: true
                 showInvisibles: true
+      tags:
+        - desktop
+        - atom
+        - testing
 
     # Install Go package for Atom
     - role: gantsign.atom-packages
@@ -576,10 +580,13 @@
               chdir: /tmp/ghdl/build
           when: ghdl_clone.changed
 
-        - name: Create firtzing dirs
+        - name: Create electronic dirs
           become: yes
           file:
-              path: /usr/share/fritzing
+              path: "/usr/share/{{item}}"
+          with_items:
+            - fritzing
+            - arduino
 
         - name: Get Fritzing
           become: yes
@@ -587,6 +594,20 @@
               src: http://fritzing.org/media/downloads/fritzing-0.9.3b.linux.AMD64.tar.bz2
               # If remote_src=no (default), local path to archive file to copy to the target server; can be absolute or relative. If remote_src=yes, path on the target server to existing archive file to unpack.,If remote_src=yes and src contains ://, the remote machine will download the file from the url first. (version_added 2.0)
               dest: /usr/share/fritzing
+              # Remote absolute path where the archive should be unpacked
+              group: # name of the group that should own the file/directory, as would be fed to I(chown)
+              remote_src: yes
+              # Set to C(yes) to indicate the archived file is already on the remote system and not local to the Ansible controller.,This option is mutually exclusive with C(copy).
+              extra_opts:
+                - "--strip-components=1"
+              # Specify additional options by passing in an array.
+              creates: /usr/share/fritzing/Fritzing
+        - name: Get arduino IDE
+          become: yes
+          unarchive:
+              src: https://downloads.arduino.cc/arduino-1.8.5-linux64.tar.xz
+              # If remote_src=no (default), local path to archive file to copy to the target server; can be absolute or relative. If remote_src=yes, path on the target server to existing archive file to unpack.,If remote_src=yes and src contains ://, the remote machine will download the file from the url first. (version_added 2.0)
+              dest: /usr/share/arduino
               # Remote absolute path where the archive should be unpacked
               group: # name of the group that should own the file/directory, as would be fed to I(chown)
               remote_src: yes

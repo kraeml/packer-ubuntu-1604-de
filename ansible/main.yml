@@ -520,53 +520,94 @@
         - wamerican
         - hunspell-en-gb
         - file-roller
-        - gtkwave
-        - gnat
       tags:
         - desktop
         - ghdl
 
-    - name: Clone ghdl
-      git:
-          dest: /tmp/ghdl
-          repo: https://github.com/tgingold/ghdl.git
-      register: ghdl_clone
-      tags:
-        - ghdl
+    - name: Electronic and Digital
+      block:
+        - name: Install Electronic packages
+          apt:
+            name: "{{ item }}"
+            state: installed
+            update_cache: yes
+            cache_valid_time: 3600
+          with_items:
+            - gtkwave
+            - gnat
+            - fritzing
+            - kicad
+            - pcb
+            - arduino
+            - geda
+            - geda-utils
+            - geda-examples
+            - gerbv
 
-    - name: Create build in ghdl
-      file:
-          path: /tmp/ghdl/build
-          state: directory
-      when: ghdl_clone.changed
-      tags:
-        - ghdl
+        - name: Clone ghdl
+          git:
+              dest: /tmp/ghdl
+              repo: https://github.com/tgingold/ghdl.git
+          register: ghdl_clone
 
-    - name: Configure ghdl
-      command: ../configure --prefix=/opt/ghdl
-      args:
-          chdir: /tmp/ghdl/build
-      when: ghdl_clone.changed
-      tags:
-        - ghdl
+        - name: Create build in ghdl
+          file:
+              path: /tmp/ghdl/build
+              state: directory
+          when: ghdl_clone.changed
 
-    - name: Make ghdl
-      become: yes
-      command: '/bin/bash -l -c /usr/bin/make'
-      args:
-          chdir: /tmp/ghdl/build
-      when: ghdl_clone.changed
-      tags:
-        - ghdl
+        - name: Configure ghdl
+          command: ../configure --prefix=/opt/ghdl
+          args:
+              chdir: /tmp/ghdl/build
+          when: ghdl_clone.changed
 
-    - name: Make install ghdl
-      become: yes
-      command: make install
-      args:
-          chdir: /tmp/ghdl/build
-      when: ghdl_clone.changed
+        - name: Make ghdl
+          become: yes
+          command: '/bin/bash -l -c /usr/bin/make'
+          args:
+              chdir: /tmp/ghdl/build
+          when: ghdl_clone.changed
+
+        - name: Make install ghdl
+          become: yes
+          command: make install
+          args:
+              chdir: /tmp/ghdl/build
+          when: ghdl_clone.changed
+
+        - name: Create firtzing dirs
+          become: yes
+          file:
+              path: /usr/share/fritzing
+
+        - name: Get Fritzing
+          become: yes
+          unarchive:
+              src: http://fritzing.org/media/downloads/fritzing-0.9.3b.linux.AMD64.tar.bz2
+              # If remote_src=no (default), local path to archive file to copy to the target server; can be absolute or relative. If remote_src=yes, path on the target server to existing archive file to unpack.,If remote_src=yes and src contains ://, the remote machine will download the file from the url first. (version_added 2.0)
+              dest: /usr/share/fritzing
+              # Remote absolute path where the archive should be unpacked
+              group: # name of the group that should own the file/directory, as would be fed to I(chown)
+              remote_src: yes
+              # Set to C(yes) to indicate the archived file is already on the remote system and not local to the Ansible controller.,This option is mutually exclusive with C(copy).
+              extra_opts:
+                - "--strip-components=1"
+              # Specify additional options by passing in an array.
+              creates: /usr/share/fritzing/Fritzing
+        - name: Member of dialout
+          become: yes
+          user:
+              name: vagrant
+              groups: dialout
+              # Puts the user in this comma-delimited list of groups. When set to the empty string ('groups='), the user is removed from all groups except the primary group.
+              append: yes
+              # If C(yes), will only add groups, not set them to just the list in I(groups).
       tags:
         - ghdl
+        - electronic
+        - desktop
+        - testing
 
     - name: Create a stopped container
       lxc_container:
@@ -611,10 +652,11 @@
               - /vagrant/gitlab/config:/etc/gitlab
               - /vagrant/gitlab/logs:/var/log/gitlab
               - /vagrant/gitlab/data:/var/opt/gitlab
+          tags:
+            - not_packer
       tags:
          - docker
          - gitlab
-         - not_packer
 
     - block:
         - name: configure screen

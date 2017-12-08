@@ -191,7 +191,6 @@
             - platformio-ide-terminal
             - platformio-ide
             - platformio-ide-debugger
-            - platformio-ide-aia
           atom_config:
             "*":
               core:
@@ -202,7 +201,6 @@
       tags:
         - desktop
         - atom
-        - testing
 
     # Install Go package for Atom
     - role: gantsign.atom-packages
@@ -524,6 +522,7 @@
         - wamerican
         - hunspell-en-gb
         - file-roller
+        - clang
       tags:
         - desktop
         - ghdl
@@ -539,14 +538,25 @@
           with_items:
             - gtkwave
             - gnat
-            - fritzing
             - kicad
             - pcb
-            - arduino
             - geda
             - geda-utils
             - geda-examples
             - gerbv
+            - avr-libc
+            - avrdude
+            - binutils-avr
+            - gcc-avr
+            - libftdi1
+            - libjna-java
+            - libjna-jni
+            - librxtx-java
+            - libqt5printsupport5
+            - libqt5serialport5
+            - libqt5sql5
+            - libqt5sql5-sqlite
+            - libqt5xml5
 
         - name: Clone ghdl
           git:
@@ -583,17 +593,18 @@
         - name: Create electronic dirs
           become: yes
           file:
-              path: "/usr/share/{{item}}"
+              path: "/opt/{{item}}"
+              state: directory
           with_items:
-            - fritzing
             - arduino
+            - fritzing
 
         - name: Get Fritzing
           become: yes
           unarchive:
               src: http://fritzing.org/media/downloads/fritzing-0.9.3b.linux.AMD64.tar.bz2
               # If remote_src=no (default), local path to archive file to copy to the target server; can be absolute or relative. If remote_src=yes, path on the target server to existing archive file to unpack.,If remote_src=yes and src contains ://, the remote machine will download the file from the url first. (version_added 2.0)
-              dest: /usr/share/fritzing
+              dest: /opt/fritzing
               # Remote absolute path where the archive should be unpacked
               group: # name of the group that should own the file/directory, as would be fed to I(chown)
               remote_src: yes
@@ -601,13 +612,13 @@
               extra_opts:
                 - "--strip-components=1"
               # Specify additional options by passing in an array.
-              creates: /usr/share/fritzing/Fritzing
+              creates: /opt/fritzing/Fritzing
         - name: Get arduino IDE
           become: yes
           unarchive:
               src: https://downloads.arduino.cc/arduino-1.8.5-linux64.tar.xz
               # If remote_src=no (default), local path to archive file to copy to the target server; can be absolute or relative. If remote_src=yes, path on the target server to existing archive file to unpack.,If remote_src=yes and src contains ://, the remote machine will download the file from the url first. (version_added 2.0)
-              dest: /usr/share/arduino
+              dest: /opt/arduino
               # Remote absolute path where the archive should be unpacked
               group: # name of the group that should own the file/directory, as would be fed to I(chown)
               remote_src: yes
@@ -615,7 +626,18 @@
               extra_opts:
                 - "--strip-components=1"
               # Specify additional options by passing in an array.
-              creates: /usr/share/fritzing/Fritzing
+              creates: /opt/arduino/arduino
+        - name: Create electronic links
+          become: yes
+          file:
+              src: "/opt/{{item.src}}/{{item.bin}}"
+              dest: "/usr/bin/{{item.bin}}"
+              state: link
+          with_items:
+            - src: arduino
+              bin: arduino
+            - src: fritzing
+              bin: Fritzing
         - name: Member of dialout
           become: yes
           user:
@@ -628,7 +650,6 @@
         - ghdl
         - electronic
         - desktop
-        - testing
 
     - name: Create a stopped container
       lxc_container:

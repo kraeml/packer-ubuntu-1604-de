@@ -540,7 +540,6 @@
             - gnat
             - kicad
             - pcb
-            - arduino
             - geda
             - geda-utils
             - geda-examples

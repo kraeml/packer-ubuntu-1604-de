@@ -962,6 +962,28 @@
               # cd into this directory before running the command
               name: bottle
               # The name of a Python library to install or the url of the remote package.,As of 2.2 you can supply a list of names.
+        - name: Install uwsgi ini
+          become: yes
+          template:
+              src: OnlinePythonTutor.ini
+              # Path of a Jinja2 formatted template on the Ansible controller. This can be a relative or absolute path.
+              dest: /etc/uwsgi/sites-available
+              # Location to render the template to on the remote machine.
+          notify: restart_uwsgi
+        - name: Link for uwsgi
+          become: yes
+          file:
+              src: /etc/uwsgi/sites-available
+              dest: /etc/uwsgi/sites-enabled
+              state: link
+          notify: restart_uwsgi
       tags:
         - OnlinePythonTutor
         - testing
+
+  handlers:
+    - name: restart_uwsgi
+      service:
+        name: uwsgi
+        state: restarted
+        enabled: yes

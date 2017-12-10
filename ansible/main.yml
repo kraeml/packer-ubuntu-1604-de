@@ -15,7 +15,7 @@
         name: "example_user"
         password: "passw0rd"
     - package_version:
-        nodejs_version: 6.x
+        nodejs_version: 8.x
         phantomjs_version: "2.1.1"
         ruby_version: 2.4.2
         molecule_version: '2.3.1'
@@ -314,6 +314,10 @@
 
     - role: geerlingguy.nginx
       nginx_remove_default_vhost: true
+      nginx_upstreams:
+        - name: _OnlinePythonTutor
+          servers:
+            - 127.0.0.1:8003
       nginx_vhosts:
         #
         - listen: "80 default_server"
@@ -361,6 +365,13 @@
             location ~ /\.ht {
                 deny all;
             }
+            location /v5 {
+                try_files $uri @uwsgi;
+            }
+            location @uwsgi {
+                include uwsgi_params;
+                uwsgi_pass _OnlinePythonTutor;
+            }
             ## Begin - Security
             # deny all direct access for these folders
             location ~* /(.git|cache|bin|logs|backups|tests)/.*$ { return 403; }
@@ -372,6 +383,7 @@
             location ~ /(LICENSE.txt|composer.lock|composer.json|nginx.conf|web.config|htaccess.txt|\.htaccess) { return 403; }
       tags:
         - db_mysql
+        - testing
 
 
     - role: geerlingguy.php
@@ -536,6 +548,7 @@
             update_cache: yes
             cache_valid_time: 3600
           with_items:
+            - logisim
             - gtkwave
             - gnat
             - kicad
@@ -627,6 +640,7 @@
                 - "--strip-components=1"
               # Specify additional options by passing in an array.
               creates: /opt/arduino/arduino
+          register: arduino
         - name: Create electronic links
           become: yes
           file:
@@ -638,6 +652,10 @@
               bin: arduino
             - src: fritzing
               bin: Fritzing
+        - name: Install arduino on desktop
+          become: yes
+          command: /opt/arduino/install.sh
+          when: arduino.changed
         - name: Member of dialout
           become: yes
           user:
@@ -901,3 +919,49 @@
             state: restarted
       tags:
         - jupyter
+
+    - name: Node-red block
+      block:
+        - name: Install nodered
+          become: yes
+          command: npm install -g --unsafe-perm node-red
+      tags:
+        - node-red
+
+    - name: OnlinePythonTutor block
+      block:
+        - name: Install dependencies
+          become: yes
+          apt:
+            name: "{{item}}"
+            update_cache: yes
+            cache_valid_time: 3600
+          with_items:
+            - uwsgi
+            - uwsgi-plugin-python
+            - nginx-full
+        - name: Clone OnlinePythonTutor
+          become: yes
+          git:
+              dest: /opt/OnlinePythonTutor
+              # Absolute path of where the repository should be checked out to. This parameter is required, unless C(clone) is set to C(no) This change was made in version 1.8.3. Prior to this version, the C(dest) parameter was always required.
+              repo: https://github.com/pgbovine/OnlinePythonTutor.git
+              # git, SSH, or HTTP(S) protocol address of the git repository.
+              clone: yes # If C(no), do not clone the repository if it does not exist locally
+              recursive: yes # if C(no), repository will be cloned without the --recursive option, skipping sub-modules.
+              update: yes
+              force: yes
+        - name: Install bottle via pip3
+          become: yes
+          pip:
+              virtualenv: /opt/OnlinePythonTutor/venv
+              # An optional path to a I(virtualenv) directory to install into. It cannot be specified together with the 'executable' parameter (added in 2.1). If the virtualenv does not exist, it will be created before installing packages. The optional virtualenv_site_packages, virtualenv_command, and virtualenv_python options affect the creation of the virtualenv.
+              virtualenv_command: virtualenv
+              # The command or a pathname to the command to create the virtual environment with. For example C(pyvenv), C(virtualenv), C(virtualenv2), C(~/bin/virtualenv), C(/usr/local/bin/virtualenv).
+              chdir: /opt/OnlinePythonTutor
+              # cd into this directory before running the command
+              name: bottle
+              # The name of a Python library to install or the url of the remote package.,As of 2.2 you can supply a list of names.
+      tags:
+        - OnlinePythonTutor
+        - testing

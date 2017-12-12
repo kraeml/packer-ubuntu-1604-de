@@ -15,7 +15,7 @@
         name: "example_user"
         password: "passw0rd"
     - package_version:
-        nodejs_version: 8.x
+        nodejs_version: 6.x
         phantomjs_version: "2.1.1"
         ruby_version: 2.4.2
         molecule_version: '2.3.1'
@@ -314,10 +314,11 @@
 
     - role: geerlingguy.nginx
       nginx_remove_default_vhost: true
-      nginx_upstreams:
-        - name: _OnlinePythonTutor
-          servers:
-            - 127.0.0.1:8003
+#      nginx_upstreams:
+#        - name: _OnlinePythonTutor
+#          servers:
+#            - 127.0.0.1:8003
+#            #- unix:////run/uwsgi/app/OnlinePythonTutor/socket
       nginx_vhosts:
         #
         - listen: "80 default_server"
@@ -365,12 +366,14 @@
             location ~ /\.ht {
                 deny all;
             }
-            location /v5 {
+            location /_OPT {
                 try_files $uri @uwsgi;
             }
             location @uwsgi {
+                rewrite  ^/_OPT/(.*) /$1 break;
                 include uwsgi_params;
-                uwsgi_pass _OnlinePythonTutor;
+                #uwsgi_pass /run/uwsgi/app/OnlinePythonTutor/socket;
+                uwsgi_pass localhost:8003;
             }
             ## Begin - Security
             # deny all direct access for these folders
@@ -383,8 +386,6 @@
             location ~ /(LICENSE.txt|composer.lock|composer.json|nginx.conf|web.config|htaccess.txt|\.htaccess) { return 403; }
       tags:
         - db_mysql
-        - testing
-
 
     - role: geerlingguy.php
       php_webserver_daemon: "nginx"
@@ -979,7 +980,6 @@
           notify: restart_uwsgi
       tags:
         - OnlinePythonTutor
-        - testing
 
   handlers:
     - name: restart_uwsgi

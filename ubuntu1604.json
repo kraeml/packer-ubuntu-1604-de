@@ -11,13 +11,6 @@
             "type": "shell",
             "execute_command":
                 "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
-            "script": "scripts/upgrade.sh",
-            "expect_disconnect": true
-        },
-        {
-            "type": "shell",
-            "execute_command":
-                "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
             "script": "scripts/setup.sh"
         },
         {
@@ -25,6 +18,13 @@
             "playbook_file": "ansible/main.yml",
             "galaxy_file": "requirements.yml",
             "extra_arguments": ["--skip-tags={{ user `ansible_skip_tags` }}"]
+        },
+        {
+            "type": "shell",
+            "execute_command":
+                "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+            "script": "scripts/upgrade.sh",
+            "expect_disconnect": true
         },
         {
             "type": "shell",
@@ -156,7 +156,7 @@
         "cpus": "2",
         "desktop": "false",
         "ansible_skip_tags": "ansible,not_packer",
-        "disk_size": "81920",
+        "disk_size": "122880",
         "vagrantfile_template": "Vagrantfile.template",
         "cloud_name": "ubuntu1604-de"
     }

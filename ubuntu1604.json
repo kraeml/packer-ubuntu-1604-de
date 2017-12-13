@@ -65,7 +65,7 @@
             "boot_wait": "10s",
             "disk_size": "{{user `disk_size`}}",
             "guest_os_type": "Ubuntu_64",
-            "headless": false,
+            "headless": true,
             "http_directory": "http",
             "iso_urls": [
                 "iso/ubuntu-16.04.3-server-amd64.iso",
@@ -117,7 +117,7 @@
             "boot_wait": "10s",
             "disk_size": "{{user `disk_size`}}",
             "guest_os_type": "ubuntu-64",
-            "headless": false,
+            "headless": true,
             "http_directory": "http",
             "iso_urls": [
                 "iso/ubuntu-16.04.2-server-amd64.iso",
@@ -155,7 +155,7 @@
         "memory": "2048",
         "cpus": "2",
         "desktop": "false",
-        "ansible_skip_tags": "ansible,not_packer",
+        "ansible_skip_tags": "ansible,not_packer,todo",
         "disk_size": "122880",
         "vagrantfile_template": "Vagrantfile.template",
         "cloud_name": "ubuntu1604-de"

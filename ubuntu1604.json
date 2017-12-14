@@ -14,6 +14,11 @@
             "script": "scripts/setup.sh"
         },
         {
+            "type": "file",
+            "source": "ansible/OnlinePythonTutor.ini",
+            "destination": "/tmp/OnlinePythonTutor.ini"
+        },
+        {
             "type": "ansible-local",
             "playbook_file": "ansible/main.yml",
             "galaxy_file": "requirements.yml",

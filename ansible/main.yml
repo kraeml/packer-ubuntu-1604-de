@@ -967,11 +967,13 @@
         - name: Install uwsgi ini
           become: yes
           template:
-              src: OnlinePythonTutor.ini
+              src: /tmp/OnlinePythonTutor.ini
               # Path of a Jinja2 formatted template on the Ansible controller. This can be a relative or absolute path.
               dest: /etc/uwsgi/sites-available
               # Location to render the template to on the remote machine.
           notify: restart_uwsgi
+          tags:
+            - packer
         - name: Link for uwsgi
           become: yes
           file:

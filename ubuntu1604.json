@@ -11,20 +11,25 @@
             "type": "shell",
             "execute_command":
                 "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
-            "script": "scripts/upgrade.sh",
-            "expect_disconnect": true
+            "script": "scripts/setup.sh"
         },
         {
-            "type": "shell",
-            "execute_command":
-                "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
-            "script": "scripts/setup.sh"
+            "type": "file",
+            "source": "ansible/OnlinePythonTutor.ini",
+            "destination": "/tmp/OnlinePythonTutor.ini"
         },
         {
             "type": "ansible-local",
             "playbook_file": "ansible/main.yml",
             "galaxy_file": "requirements.yml",
             "extra_arguments": ["--skip-tags={{ user `ansible_skip_tags` }}"]
+        },
+        {
+            "type": "shell",
+            "execute_command":
+                "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+            "script": "scripts/upgrade.sh",
+            "expect_disconnect": true
         },
         {
             "type": "shell",
@@ -65,7 +70,7 @@
             "boot_wait": "10s",
             "disk_size": "{{user `disk_size`}}",
             "guest_os_type": "Ubuntu_64",
-            "headless": false,
+            "headless": true,
             "http_directory": "http",
             "iso_urls": [
                 "iso/ubuntu-16.04.3-server-amd64.iso",
@@ -117,7 +122,7 @@
             "boot_wait": "10s",
             "disk_size": "{{user `disk_size`}}",
             "guest_os_type": "ubuntu-64",
-            "headless": false,
+            "headless": true,
             "http_directory": "http",
             "iso_urls": [
                 "iso/ubuntu-16.04.2-server-amd64.iso",
@@ -155,8 +160,8 @@
         "memory": "2048",
         "cpus": "2",
         "desktop": "false",
-        "ansible_skip_tags": "ansible,not_packer",
-        "disk_size": "81920",
+        "ansible_skip_tags": "ansible,not_packer,todo",
+        "disk_size": "122880",
         "vagrantfile_template": "Vagrantfile.template",
         "cloud_name": "ubuntu1604-de"
     }

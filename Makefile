@@ -15,6 +15,9 @@ make-ka:
 	mv ka-sa-pr-build/builds/Makefile.KA* ka-sa-pr-build/Makefile
 	sed -i 's/    /\t/g' ka-sa-pr-build/Makefile
 
-test-ansible:
+galaxy:
 	sudo ansible-galaxy install --role-file=requirements.yml
+test-ansible: galaxy
 	ansible-playbook -i localhost, -e ansible_connection=local --skip-tags=packer --tags=testing ansible/main.yml
+full-ansible: galaxy
+	ansible-playbook -i localhost, -e ansible_connection=local --skip-tags=packer ansible/main.yml

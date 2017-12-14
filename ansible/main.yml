@@ -472,6 +472,18 @@
         - avahi-utils
         - nmap
 
+    - name: Install Python packages
+      become: yes
+      pip:
+          name: "{{item}}"
+          executable: pip3
+      with_items:
+        - pytest
+        - pytest-pep8
+      tags:
+        - pythone-dev
+        - testing
+
     - name: Git config
       become: yes
       become_user: vagrant
@@ -797,11 +809,11 @@
           with_items:
             - url: https://cloud.franken.de/owncloud/index.php/s/Bg6uuMolM5SJha0/download
               dest: bsa/
-            - url: https://cloud.franken.de/owncloud/index.php/s/aqobZwzHykXmpii/download
-              dest: itec/
+            #- url: https://cloud.franken.de/owncloud/index.php/s/aqobZwzHykXmpii/download
+            #  dest: itec/
       tags:
         - rdf
-        - todo
+        #- todo
 
     - block:
         - name: Install phpmyadmin

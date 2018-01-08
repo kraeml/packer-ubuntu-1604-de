@@ -1,5 +1,11 @@
 desktop:
-	bin/box build ubuntu1604-desktop-de virtualbox
+	TMPDIR=/home/michl/tmp bin/box build ubuntu1604-desktop-de
+
+desktop-virtualbox:
+	TMPDIR=/home/michl/tmp bin/box build ubuntu1604-desktop-de virtualbox
+
+desktop-vmware:
+	TMPDIR=/home/michl/tmp bin/box build ubuntu1604-desktop-de vmware
 
 desktop-bsa-pr:
 	DEBUG=true PR=KA bin/box build ubuntu1604-desktop-de-PR virtualbox

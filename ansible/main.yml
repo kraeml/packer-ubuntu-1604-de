@@ -548,6 +548,7 @@
         - hunspell-en-gb
         - file-roller
         - clang
+        - texworks
       tags:
         - desktop
         - ghdl
@@ -860,6 +861,10 @@
           - python3-dev
           - python3-pip
           - pandoc
+          - cmake
+          - clang
+          - llvm
+          - llvm-dev
       - name: jupyter via pip
         pip:
             executable: pip3
@@ -874,9 +879,14 @@
           - ExpectException
           - RISE
           - myhdl
+          #- jupyter_c_kernel
 
       - name: Insall bash kernel
-        command: /usr/bin/python3 -m bash_kernel.install
+        command: /usr/bin/python3 -m bash_kernel.install --sys-prefix
+
+      - name: Install jupyter_c_kernel
+        command: /usr/local/bin/install_c_kernel --sys-prefix
+
       - name: Enable jupyter widgetsnbextension
         command: jupyter nbextension enable --py --sys-prefix widgetsnbextension
       - name: Get jupyter config script

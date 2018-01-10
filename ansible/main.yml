@@ -884,8 +884,8 @@
       - name: Insall bash kernel
         command: /usr/bin/python3 -m bash_kernel.install --sys-prefix
 
-      - name: Install jupyter_c_kernel
-        command: /usr/local/bin/install_c_kernel --sys-prefix
+#      - name: Install jupyter_c_kernel
+#        command: /usr/local/bin/install_c_kernel --sys-prefix
 
       - name: Enable jupyter widgetsnbextension
         command: jupyter nbextension enable --py --sys-prefix widgetsnbextension

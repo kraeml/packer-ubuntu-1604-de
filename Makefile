@@ -10,8 +10,11 @@ desktop-vmware:
 desktop-bsa-pr:
 	DEBUG=true PR=KA bin/box build ubuntu1604-desktop-de-PR virtualbox
 
-make-usb:
+make-usb-pr:
 	DEBUG=true PR=KA bin/create-usb.sh
+
+make-usb:
+	DEBUG=true bin/create-usb.sh
 
 make-ka:
 	#rm -rf ka-sa-pr-build/* || true

@@ -122,6 +122,14 @@
       tags:
         - python-dev
 
+    - role: kraeml.jupyter
+      become: yes
+      nodejs_version: "{{package_version.nodejs_version}}"
+      npm_config_unsafe_perm: "true"
+      tags:
+        - python-dev
+        - jupyter
+
     - role: tersmitten.ansible
       tags:
         - ansible
@@ -525,6 +533,19 @@
       tags:
         - lxc-dev
 
+    - name: "Extend ubuntu template"
+      become: yes
+      replace:
+          regexp: "apt-transport-https,ssh,vim"
+          # The regular expression to look for in the contents of the file.
+          # Uses Python regular expressions;
+          # see U(http://docs.python.org/2/library/re.html).
+          # Uses multiline mode, which means C(^) and C($) match the beginning
+          # and end respectively of I(each line) of the file.
+          dest: "/usr/local/share/lxc/templates/lxc-ubuntu"
+          # The file to modify.
+          replace: "apt-transport-https,ssh,vim,manpages,man-db,bash-completion"
+
     - name: "Install desktop needed packages"
       apt:
         name: "{{ item }}"
@@ -848,101 +869,101 @@
         - db_mysql
         - phpmyadmin
 
-    - name: Install jupyter
-      block:
-      - name: jupyter packages
-        apt:
-            name: "{{item}}"
-            update_cache: yes
-            cache_valid_time: 3600
-        with_items:
-          - libncurses5-dev
-          - python-dev
-          - python3-dev
-          - python3-pip
-          - pandoc
-          - cmake
-          - clang
-          - llvm
-          - llvm-dev
-      - name: jupyter via pip
-        pip:
-            executable: pip3
-            name: "{{item}}"
-        with_items:
-          - jupyter
-          - readline
-          - ipyparallel
-          - bash_kernel
-          - ipython-sql
-          - ihtml
-          - ExpectException
-          - RISE
-          - myhdl
-          #- jupyter_c_kernel
+#    - name: Install jupyter
+#      block:
+#      - name: jupyter packages
+#        apt:
+#            name: "{{item}}"
+#            update_cache: yes
+#            cache_valid_time: 3600
+#        with_items:
+#          - libncurses5-dev
+#          - python-dev
+#          - python3-dev
+#          - python3-pip
+#          - pandoc
+#          - cmake
+#          - clang
+#          - llvm
+#          - llvm-dev
+#      - name: jupyter via pip
+#        pip:
+#            executable: pip3
+#            name: "{{item}}"
+#        with_items:
+#          - jupyter
+#          - readline
+#          - ipyparallel
+#          - bash_kernel
+#          - ipython-sql
+#          - ihtml
+#          - ExpectException
+#          - RISE
+#          - myhdl
+#          #- jupyter_c_kernel
+#
+#      - name: Insall bash kernel
+#        command: /usr/bin/python3 -m bash_kernel.install --sys-prefix
 
-      - name: Insall bash kernel
-        command: /usr/bin/python3 -m bash_kernel.install --sys-prefix
-
-#      - name: Install jupyter_c_kernel
-#        command: /usr/local/bin/install_c_kernel --sys-prefix
-
-      - name: Enable jupyter widgetsnbextension
-        command: jupyter nbextension enable --py --sys-prefix widgetsnbextension
-      - name: Get jupyter config script
-        get_url:
-            dest: /tmp/configure_jupyter.sh
-            url: https://cloud.franken.de/owncloud/index.php/s/I6Vs9u803LAQZ9R/download
-            owner: vagrant
-            group: vagrant
-            mode: 0774
-      - name: Ensure jupyter config is set
-        script: /tmp/configure_jupyter.sh
-        args:
-            creates: /home/vagrant/.jupyter/jupyter_notebook_config.py
-        become: yes
-        become_user: vagrant
-      - name: Copy jupyter config
-        become: yes
-        get_url:
-            url: https://cloud.franken.de/owncloud/index.php/s/xSQvKOHH64Z0W45/download
-            dest: /lib/systemd/system/jupyter.service
-            owner: root
-            group: root
-            mode: 0644
-      - name: Enable Jupyter
-        become: yes
-        service:
-            name: jupyter
-            enabled: yes
-      - name: Install js kernel
-        become: yes
-        npm:
-            global: yes
-            name: ijavascript
-      - name: Install javascript kernel
-        command: ijsinstall --install=global
-        become: yes
-
-      - name: Ensure RISE installed
-        become: yes
-        command: jupyter-nbextension install rise --py --sys-prefix
-        args:
-          creates: /usr/local/share/jupyter/nbextensions/rise/
-        register: jupyter_rise
-
-      - name: Ensure RISE enabled
-        become: yes
-        command: jupyter-nbextension enable rise --py --sys-prefix
-        when: jupyter_rise.changed
-
-      - name: Restart Jupyter
-        become: yes
-        service:
-            name: jupyter
-            state: restarted
-      tags:
-        - jupyter
+##      - name: Install jupyter_c_kernel
+##        command: /usr/local/bin/install_c_kernel --sys-prefix
+#
+#      - name: Enable jupyter widgetsnbextension
+#        command: jupyter nbextension enable --py --sys-prefix widgetsnbextension
+#      - name: Get jupyter config script
+#        get_url:
+#            dest: /tmp/configure_jupyter.sh
+#            url: https://cloud.franken.de/owncloud/index.php/s/I6Vs9u803LAQZ9R/download
+#            owner: vagrant
+#            group: vagrant
+#            mode: 0774
+#      - name: Ensure jupyter config is set
+#        script: /tmp/configure_jupyter.sh
+#        args:
+#            creates: /home/vagrant/.jupyter/jupyter_notebook_config.py
+#        become: yes
+#        become_user: vagrant
+#      - name: Copy jupyter config
+#        become: yes
+#        get_url:
+#            url: https://cloud.franken.de/owncloud/index.php/s/xSQvKOHH64Z0W45/download
+#            dest: /lib/systemd/system/jupyter.service
+#            owner: root
+#            group: root
+#            mode: 0644
+#      - name: Enable Jupyter
+#        become: yes
+#        service:
+#            name: jupyter
+#            enabled: yes
+#      - name: Install js kernel
+#        become: yes
+#        npm:
+#            global: yes
+#            name: ijavascript
+#      - name: Install javascript kernel
+#        command: ijsinstall --install=global
+#        become: yes
+#
+#      - name: Ensure RISE installed
+#        become: yes
+#        command: jupyter-nbextension install rise --py --sys-prefix
+#        args:
+#          creates: /usr/local/share/jupyter/nbextensions/rise/
+#        register: jupyter_rise
+#
+#      - name: Ensure RISE enabled
+#        become: yes
+#        command: jupyter-nbextension enable rise --py --sys-prefix
+#        when: jupyter_rise.changed
+#
+#      - name: Restart Jupyter
+#        become: yes
+#        service:
+#            name: jupyter
+#            state: restarted
+#      tags:
+#        - jupyter
 
     - name: Node-red block
       block:

@@ -38,3 +38,6 @@
 - src: gantsign.molecule
 - src: franklinkim.git
 - src: wtanaka.vagrant
+- src: https://github.com/kraeml/ansible-role-jupyter
+  version: master
+  name: kraeml.jupyter

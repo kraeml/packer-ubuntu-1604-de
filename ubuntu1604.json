@@ -22,7 +22,10 @@
             "type": "ansible-local",
             "playbook_file": "ansible/main.yml",
             "galaxy_file": "requirements.yml",
-            "extra_arguments": ["--skip-tags={{ user `ansible_skip_tags` }}"]
+            "extra_arguments": [
+                "--skip-tags={{ user `ansible_skip_tags` }}",
+                "--user=vagrant"
+            ]
         },
         {
             "type": "shell",
@@ -70,7 +73,7 @@
             "boot_wait": "10s",
             "disk_size": "{{user `disk_size`}}",
             "guest_os_type": "Ubuntu_64",
-            "headless": false,
+            "headless": true,
             "http_directory": "http",
             "iso_urls": [
                 "iso/ubuntu-16.04.3-server-amd64.iso",
@@ -122,7 +125,7 @@
             "boot_wait": "10s",
             "disk_size": "{{user `disk_size`}}",
             "guest_os_type": "ubuntu-64",
-            "headless": false,
+            "headless": true,
             "http_directory": "http",
             "iso_urls": [
                 "iso/ubuntu-16.04.3-server-amd64.iso",

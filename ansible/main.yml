@@ -490,7 +490,6 @@
         - pytest-pep8
       tags:
         - pythone-dev
-        - testing
 
     - name: Git config
       become: yes
@@ -500,22 +499,14 @@
         value: "{{item.value}}"
         scope: global
       with_items:
-        - {
-            name: "user.email",
-            value: "vagrant@example.com"
-        }
-        - {
-            name: "user.name",
-            value: "vagrant"
-        }
-        - {
-            name: "core.editor",
-            value: "vim"
-        }
-        - {
-            name: "push.default",
-            value: "simple"
-        }
+        - name: "user.email"
+          value: "vagrant@example.com"
+        - name: "user.name"
+          value: "vagrant"
+        - name: "core.editor"
+          value: "vim"
+        - name: "push.default"
+          value: "simple"
       tags:
         - git
 
@@ -544,7 +535,7 @@
           # and end respectively of I(each line) of the file.
           dest: "/usr/local/share/lxc/templates/lxc-ubuntu"
           # The file to modify.
-          replace: "apt-transport-https,ssh,vim,manpages,man-db,bash-completion"
+          replace: "apt-transport-https,ssh,vim,manpages,man-db,bash-completion,whois"
 
     - name: "Install desktop needed packages"
       apt:
@@ -572,7 +563,6 @@
         - texworks
       tags:
         - desktop
-        - ghdl
 
     - name: Electronic and Digital
       block:
@@ -972,6 +962,7 @@
           command: npm install -g --unsafe-perm node-red
       tags:
         - node-red
+        - nodejs
 
     - name: OnlinePythonTutor block
       block:

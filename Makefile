@@ -8,7 +8,7 @@ desktop-vmware:
 	TMPDIR=/home/michl/tmp bin/box build ubuntu1604-desktop-de vmware
 
 desktop-bsa-pr:
-	DEBUG=true PR=KA bin/box build ubuntu1604-desktop-de-PR virtualbox
+	ansible-playbook pr_packer.yml
 
 make-usb-pr:
 	DEBUG=true PR=KA bin/create-usb.sh
@@ -23,6 +23,11 @@ make-ka:
 	mv ka-sa-pr-build/builds/Vagrantfile.KA* ka-sa-pr-build/Vagrantfile
 	mv ka-sa-pr-build/builds/Makefile.KA* ka-sa-pr-build/Makefile
 	sed -i 's/    /\t/g' ka-sa-pr-build/Makefile
+
+make-ka-complete:
+	rm -rf ka-sa-pr-build/* || true
+	#make desktop-bsa-pr
+	make make-ka
 
 galaxy:
 	sudo ansible-galaxy install --role-file=requirements.yml

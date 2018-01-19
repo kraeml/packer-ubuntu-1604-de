@@ -16,6 +16,6 @@
     "vagrantfile_template": "Vagrantfile.template",
     "hostname": "rdf-dev",
     "ansible_skip_tags":
-        "ansible,testing,nodejs,chrome,web-dev,golang,java,db_mysql,no_sql,docker,vagrant,rdf,git,jupyter,gitlab,electronic,ghdl",
+        "ansible,testing,nodejs,chrome,web-dev,golang,java,db_mysql,no_sql,docker,vagrant,rdf,git,jupyter,gitlab,electronic,ghdl,OnlinePythonTutor",
     "cloud_name": "ubuntu1604-desktop-de"
 }

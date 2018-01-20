@@ -3,8 +3,6 @@
   connection: local
   gather_facts: no
 
-  vars:
-    ka_dir: ka-sa-pr-build
   vars_prompt:
   - name: PR
     prompt: Welche Version RDF/KA/SA_1/SA_2/PR
@@ -49,37 +47,3 @@
     file:
         path: VERSION.bak
         state: absent
-
-  - name: Remove {{ka_dir}}
-    file:
-        path: "{{ka_dir}}"
-        state: absent
-
-  - name: Create {{ka_dir}}
-    file:
-        path: "{{ka_dir}}/builds"
-        state: directory
-        recurse: yes
-    tags:
-        - create
-
-  - name: Rsync virtualbox-ubuntu1604-{{PR}}-{{mydate}}.box
-    # rsync -av --human-readable builds/*KA* ka-sa-pr-build/builds
-    #  	mv ka-sa-pr-build/builds/Vagrantfile.KA* ka-sa-pr-build/Vagrantfile
-    #  	mv ka-sa-pr-build/builds/Makefile.KA* ka-sa-pr-build/Makefile
-    synchronize:
-        src: "builds/{{item.src}}"
-        # Path on the source host that will be synchronized to the destination;
-        # The path can be absolute or relative.
-        dest: "{{item.dest}}"
-        # Path on the destination host that will be synchronized from the source;
-        # The path can be absolute or relative.
-    with_items:
-        - src: virtualbox-ubuntu1604-{{PR}}-{{mydate}}.box
-          dest: "{{ka_dir}}/builds/virtualbox-ubuntu1604-{{PR}}-{{mydate}}.box"
-        - src: Vagrantfile.{{PR}}-{{mydate}}
-          dest: "{{ka_dir}}/Vagrantfile"
-        #- src: Makefile.{{PR}}-{{mydate}}
-        #  dest: "{{ka_dir}}/Makefile"
-    tags:
-        - create

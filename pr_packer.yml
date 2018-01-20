@@ -1,0 +1,85 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars:
+    ka_dir: ka-sa-pr-build
+  vars_prompt:
+  - name: PR
+    prompt: Welche Version RDF/KA/SA_1/SA_2/PR
+    default: RDF
+    private: no
+
+  tasks:
+  - name: Get Version from file
+    set_fact: mydate="{{lookup('pipe', 'cat VERSION')}}"
+    tags:
+        - create
+        - testing
+        # Not remove testing here
+  - name: Create backup version file
+    shell: echo {{mydate}} > VERSION.bak
+    args:
+        creates: VERSION.bak
+
+  - name: Get Version from date
+    set_fact: mydate="{{lookup('pipe','date +%y.%m.%d-%H')}}"
+
+  - name: Print Version
+    debug:
+        msg: Die Box virtualbox-ubuntu1604-{{PR}}-{{mydate}}.box wird erstellt.
+    tags:
+        - create
+
+  - name: Create Box
+    shell: DEBUG=true PR="{{PR}}" bin/box build ubuntu1604-desktop-de-PR virtualbox
+    args:
+        creates: ./builds/virtualbox-ubuntu1604-{{PR}}-{{mydate}}.box
+    ignore_errors: yes
+    register: box
+
+  - block:
+        - name: Bumb VERSION
+          command: mv VERSION.bak VERSION
+        - meta: end_play
+    when: box|failed
+
+  - name: Remove VERSION.bak
+    file:
+        path: VERSION.bak
+        state: absent
+
+  - name: Remove {{ka_dir}}
+    file:
+        path: "{{ka_dir}}"
+        state: absent
+
+  - name: Create {{ka_dir}}
+    file:
+        path: "{{ka_dir}}/builds"
+        state: directory
+        recurse: yes
+    tags:
+        - create
+
+  - name: Rsync virtualbox-ubuntu1604-{{PR}}-{{mydate}}.box
+    # rsync -av --human-readable builds/*KA* ka-sa-pr-build/builds
+    #  	mv ka-sa-pr-build/builds/Vagrantfile.KA* ka-sa-pr-build/Vagrantfile
+    #  	mv ka-sa-pr-build/builds/Makefile.KA* ka-sa-pr-build/Makefile
+    synchronize:
+        src: "builds/{{item.src}}"
+        # Path on the source host that will be synchronized to the destination;
+        # The path can be absolute or relative.
+        dest: "{{item.dest}}"
+        # Path on the destination host that will be synchronized from the source;
+        # The path can be absolute or relative.
+    with_items:
+        - src: virtualbox-ubuntu1604-{{PR}}-{{mydate}}.box
+          dest: "{{ka_dir}}/builds/virtualbox-ubuntu1604-{{PR}}-{{mydate}}.box"
+        - src: Vagrantfile.{{PR}}-{{mydate}}
+          dest: "{{ka_dir}}/Vagrantfile"
+        #- src: Makefile.{{PR}}-{{mydate}}
+        #  dest: "{{ka_dir}}/Makefile"
+    tags:
+        - create

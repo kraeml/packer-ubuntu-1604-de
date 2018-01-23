@@ -1,0 +1,49 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars_prompt:
+  - name: PR
+    prompt: Welche Version RDF/KA/SA_1/SA_2/PR
+    default: RDF
+    private: no
+
+  tasks:
+  - name: Get Version from file
+    set_fact: mydate="{{lookup('pipe', 'cat VERSION')}}"
+    tags:
+        - create
+        - testing
+        # Not remove testing here
+  - name: Create backup version file
+    shell: echo {{mydate}} > VERSION.bak
+    args:
+        creates: VERSION.bak
+
+  - name: Get Version from date
+    set_fact: mydate="{{lookup('pipe','date +%y.%m.%d-%H')}}"
+
+  - name: Print Version
+    debug:
+        msg: Die Box virtualbox-ubuntu1604-{{PR}}-{{mydate}}.box wird erstellt.
+    tags:
+        - create
+
+  - name: Create Box
+    shell: DEBUG=true PR="{{PR}}" bin/box build ubuntu1604-desktop-de-PR virtualbox
+    args:
+        creates: ./builds/virtualbox-ubuntu1604-{{PR}}-{{mydate}}.box
+    ignore_errors: yes
+    register: box
+
+  - block:
+        - name: Bumb VERSION
+          command: mv VERSION.bak VERSION
+        - meta: end_play
+    when: box|failed
+
+  - name: Remove VERSION.bak
+    file:
+        path: VERSION.bak
+        state: absent

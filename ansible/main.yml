@@ -537,30 +537,38 @@
           # The file to modify.
           replace: "apt-transport-https,ssh,vim,manpages,man-db,bash-completion,whois"
 
-    - name: "Install desktop needed packages"
-      apt:
-        name: "{{ item }}"
-        state: installed
-        update_cache: yes
-        cache_valid_time: 3600
-      with_items:
-        - hunspell-de-ch
-        - wogerman
-        - hunspell-de-at
-        - hunspell-en-us
-        - wbritish
-        - hunspell-de-de
-        - language-pack-gnome-de
-        - wngerman
-        - hunspell-en-au
-        - wswiss
-        - hunspell-en-za
-        - hunspell-en-ca
-        - wamerican
-        - hunspell-en-gb
-        - file-roller
-        - clang
-        - texworks
+    - name: Desktop Block
+      block:
+      - name: "Install desktop needed packages"
+        apt:
+            name: "{{ item }}"
+            state: installed
+            update_cache: yes
+            cache_valid_time: 3600
+        with_items:
+            - hunspell-de-ch
+            - wogerman
+            - hunspell-de-at
+            - hunspell-en-us
+            - wbritish
+            - hunspell-de-de
+            - language-pack-gnome-de
+            - wngerman
+            - hunspell-en-au
+            - wswiss
+            - hunspell-en-za
+            - hunspell-en-ca
+            - wamerican
+            - hunspell-en-gb
+            - file-roller
+            - clang
+            - texworks
+        - name: Deactivate powweroff dialog
+          become: yes
+          command: "{{item}}"
+          with_items:
+            - "gsettings set com.canonical.indicator.session suppress-logout-restart-shutdown true"
+            - "gsettings set org.gnome.settings-daemon.plugins.power button-power 'shutdown'"
       tags:
         - desktop
 

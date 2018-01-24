@@ -53,7 +53,6 @@
       tags:
         - locale_de
 
-    # Install and configure Git version control
     - role: franklinkim.git
       become: yes
       git_config:
@@ -563,11 +562,12 @@
             - file-roller
             - clang
             - texworks
-        - name: Deactivate powweroff dialog
-          become: yes
-          command: "{{item}}"
-          with_items:
-            - "gsettings set com.canonical.indicator.session suppress-logout-restart-shutdown true"
+
+      - name: Deactivate powweroff dialog
+        become: yes
+        command: "{{item}}"
+        with_items:
+            # - "gsettings set com.canonical.indicator.session suppress-logout-restart-shutdown true"
             - "gsettings set org.gnome.settings-daemon.plugins.power button-power 'shutdown'"
       tags:
         - desktop

@@ -5,7 +5,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "rdf" do |rdf|
       rdf.ssh.insert_key = false
       rdf.vm.hostname = "rdf-dev"
-      rdf.vm.box = "file://builds/virtualbox-ubuntu1604-SA_1-18.01.20-21.box"
+      rdf.vm.box = "file://builds/virtualbox-ubuntu1604-SA_1-18.01.24-16.box"
       rdf.vm.network :private_network, ip: "172.22.3.2"
 
       config.vm.provider :virtualbox do |v|

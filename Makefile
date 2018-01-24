@@ -10,6 +10,9 @@ desktop-vmware:
 desktop-bsa-pr:
 	ansible-playbook pr_packer.yml
 
+desktop-bsa-pr-sa1:
+	DEBUG=true PR=SA_1 bin/box build ubuntu1604-desktop-de-PR virtualbox
+
 make-usb-pr:
 	DEBUG=true PR=KA bin/create-usb.sh
 

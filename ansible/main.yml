@@ -534,7 +534,7 @@
           # and end respectively of I(each line) of the file.
           dest: "/usr/local/share/lxc/templates/lxc-ubuntu"
           # The file to modify.
-          replace: "apt-transport-https,ssh,vim,manpages,man-db,bash-completion,whois"
+          replace: "apt-transport-https,ssh,vim,manpages,man-db,bash-completion,whois,python,python-apt"
 
     - name: Desktop Block
       block:
@@ -564,7 +564,6 @@
             - texworks
 
       - name: Deactivate powweroff dialog
-        become: yes
         command: "{{item}}"
         with_items:
             # - "gsettings set com.canonical.indicator.session suppress-logout-restart-shutdown true"

@@ -1,6 +1,6 @@
 ---
 - hosts: all
-  become: yes
+  #become: yes
   gather_facts: yes
 
   vars:
@@ -24,12 +24,15 @@
 
   roles:
     - role: geerlingguy.nfs
+      become: yes
       tags:
         - packer
     - role: geerlingguy.packer-debian
+      become: yes
       tags:
         - packer
     - role: tersmitten.locales
+      become: yes
       locales_present:
         - en_US.UTF-8
         - de_DE.UTF-8
@@ -44,10 +47,12 @@
       tags:
         - locale_de
     - role: tersmitten.timezone
+      become: yes
       timezone_zone: "Etc/UTC"
       tags:
         - locale_de
     - role: gantsign.keyboard
+      become: yes
       keyboard_model: pc105
       keyboard_layout: de
       tags:
@@ -69,15 +74,40 @@
         - git
     # Add lcx development
     - role: cmprescott.dnsmasq
+      become: yes
       dnsmasq_dns_interfaces: []
       tags:
         - lxc-dev
     - role: toopy.lxc-dev
+      become: yes
       lxc_config_path: "/var/lib/lxc/"
+      lxc_dev_system_packages:
+        - name: automake
+        - name: debootstrap
+        - name: git
+        - name: libcap-dev
+        - name: libtool
+        - name: make
+        - name: pkg-config
+        - name: python-dev
+        - name: python-pip
+        - name: resolvconf
+        - name: libapparmor-dev
+        - name: libseccomp-dev
+        - name: python3-dev
+        - name: python3-setuptools
+        - name: docbook2x
+        - name: libgnutls-dev
+        - name: liblua5.2-dev
+        - name: libselinux1-dev
+        - name: libcgmanager-dev
+        - name: gcc
+        - name: clang
       tags:
         - lxc-dev
     # Add Node.js
     - role: geerlingguy.nodejs
+      become: yes
       nodejs_version: "{{package_version.nodejs_version}}"
       nodejs_install_npm_user: vagrant
       nodejs_npm_global_packages:
@@ -114,10 +144,12 @@
         - nodejs
 
     - role: tersmitten.pip
+      become: yes
       tags:
         - python-dev
 
     - role: tersmitten.virtualenv
+      become: yes
       tags:
         - python-dev
 
@@ -130,27 +162,32 @@
         - jupyter
 
     - role: tersmitten.ansible
+      become: yes
       tags:
         - ansible
         - not_packer
 
     - role: gantsign.xdesktop
+      become: yes
       xdesktop_desktop: unity
       tags:
         - desktop
 
     - role: gantsign.lightdm
+      become: yes
       lightdm_autologin_user: vagrant
       tags:
         - desktop
 
     # Install Terminator terminal emulator
     - role: gantsign.terminator
+      become: yes
       tags:
         - desktop
 
     # Install Google Chrome web broswer
     - role: cmprescott.chrome
+      become: yes
       tags:
         - desktop
         - chrome
@@ -165,6 +202,7 @@
       default_web_browser: google-chrome
 
     - role: nicolai86.phantomjs
+      become: yes
       tags:
         - web-dev
         #
@@ -174,6 +212,7 @@
     #
     # Install Atom editor
     - role: gantsign.atom
+      become: yes
       users:
         - username: vagrant
           atom_packages:
@@ -211,6 +250,7 @@
 
     # Install Go package for Atom
     - role: gantsign.atom-packages
+      become: yes
       tags:
         - desktop
         - atom
@@ -222,17 +262,20 @@
 
     # Install Go language SDK
     - role: gantsign.golang
+      become: yes
       tags:
         - golang
       golang_gopath: '$HOME/workspace-go'
 
     - role: tschifftner.firefox
+      become: yes
       tags:
         - desktop
       firefox_language: 'de'
       firefox_os: 'linux-x86_64'
 
     - role: geerlingguy.java
+      become: yes
       when: "ansible_os_family == 'Debian'"
       java_packages:
         - openjdk-8-jdk
@@ -299,6 +342,7 @@
 #        JAVA_HOME: "{{ ansible_local.java.general.home }}"
 
     - role: arknoll.selenium
+      become: yes
       selenium_install_firefox: yes
       tags:
         - web-dev
@@ -320,6 +364,7 @@
         - db_mysql
 
     - role: geerlingguy.nginx
+      become: yes
       nginx_remove_default_vhost: true
 #      nginx_upstreams:
 #        - name: _OnlinePythonTutor
@@ -395,6 +440,7 @@
         - db_mysql
 
     - role: geerlingguy.php
+      become: yes
       php_webserver_daemon: "nginx"
       php_enable_php_fpm: true
       tags:
@@ -402,11 +448,13 @@
 
 
     - role: geerlingguy.php-mysql
+      become: yes
       tags:
         - db_mysql
 
 
     - role: greendayonfire.mongodb
+      become: yes
       mongodb_security_authorization: "enabled"
       mongodb_users:
       - name: "{{db_user.name}}"
@@ -418,6 +466,7 @@
 
     # Install Docker
     - role: angstwad.docker_ubuntu
+      become: yes
       docker_group_members:
         - vagrant
       tags:
@@ -425,6 +474,7 @@
 
     # Install Kubernetes
     - role: gantsign.kubernetes
+      become: yes
       tags:
         - kubernetes
         - docker
@@ -432,12 +482,14 @@
 
     # Install Molecule for testing Ansible roles & playbooks
     - role: gantsign.molecule
+      become: yes
       molecule_version: "{{package_version.molecule_version}}"
       tags:
         - docker
         - molecule
 
     - role: wtanaka.vagrant
+      become: yes
       vagrant_url: "https://releases.hashicorp.com/vagrant/{{package_version.vagrant}}/vagrant_{{package_version.vagrant}}_x86_64.deb"
       tags:
         - vagrant
@@ -445,6 +497,7 @@
 
   tasks:
     - name: "Install needed packages"
+      become: yes
       apt:
         name: "{{ item }}"
         state: installed
@@ -491,8 +544,6 @@
         - pythone-dev
 
     - name: Git config
-      become: yes
-      become_user: vagrant
       git_config:
         name: "{{item.name}}"
         value: "{{item.value}}"
@@ -510,6 +561,7 @@
         - git
 
     - name: "Install lxc-dev needed packages"
+      become: yes
       apt:
         name: "{{ item }}"
         state: installed
@@ -539,6 +591,7 @@
     - name: Desktop Block
       block:
       - name: "Install desktop needed packages"
+        become: yes
         apt:
             name: "{{ item }}"
             state: installed
@@ -574,6 +627,7 @@
     - name: Electronic and Digital
       block:
         - name: Install Electronic packages
+          become: yes
           apt:
             name: "{{ item }}"
             state: installed
@@ -702,6 +756,7 @@
         - desktop
 
     - name: Create a stopped container
+      become: yes
       lxc_container:
         name: "{{container_prefix}}{{item}}"
         container_log: true
@@ -712,6 +767,7 @@
         - lxc-dev
 
     - name: Remove container
+      become: yes
       lxc_container:
         name: "{{container_prefix}}{{item}}"
         container_log: true
@@ -723,12 +779,14 @@
 
     - block:
         - name: pull an docker images
+          become: yes
           docker_image:
             name: "{{item}}"
           with_items:
             - gitlab/gitlab-ce
 
         - name: Start gitlab container
+          become: yes
           docker_container:
             name: gitlab
             hostname: gitlab.rdf-dev
@@ -752,6 +810,7 @@
 
     - block:
         - name: configure screen
+          become: yes
           lineinfile:
             path: /etc/screenrc
             regexp: '^caption always'
@@ -768,8 +827,6 @@
               fi
 
         - name: Ensure rdf directories exists
-          become: yes
-          become_user: vagrant
           file:
             path: "/home/vagrant/rdf/{{item}}"
             state: directory
@@ -783,8 +840,6 @@
             - ina
 
         - name: Clone git for rdf
-          become_user: vagrant
-          become: yes
           git:
             dest: "/home/vagrant/rdf/{{item.path}}/{{item.repo}}"
             force: yes
@@ -802,8 +857,6 @@
               version: master
 
         - name: OWC File Transfer
-          become: yes
-          become_user: vagrant
           unarchive:
               dest: "/home/vagrant/rdf/ina/"
               src: https://cloud.franken.de/owncloud/index.php/s/j0vW45mnASmJCFk/download
@@ -818,8 +871,6 @@
               path: ina/hands-on-ina
 
         - name: Get RDF files from owncloud
-          become: yes
-          become_user: vagrant
           get_url:
               dest: "/home/vagrant/rdf/{{item.dest}}"
               url: "{{item.url}}"
@@ -836,6 +887,7 @@
 
     - block:
         - name: Install phpmyadmin
+          become: yes
           vars:
             version: "{{package_version.phpmyadmin}}"
           unarchive:
@@ -846,6 +898,7 @@
             remote_src: yes
 
         - name: Link to phpmyadmin
+          become: yes
           vars:
              version: "{{package_version.phpmyadmin}}"
           file:
@@ -1027,6 +1080,7 @@
 
   handlers:
     - name: restart_uwsgi
+      become: yes
       service:
         name: uwsgi
         state: restarted

@@ -157,6 +157,7 @@
       become: yes
       nodejs_version: "{{package_version.nodejs_version}}"
       npm_config_unsafe_perm: "true"
+      notebook_dir: "{{ansible_user_dir}}"
       tags:
         - python-dev
         - jupyter

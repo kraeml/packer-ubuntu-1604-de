@@ -809,24 +809,24 @@
          - docker
          - gitlab
 
+    - name: configure screen
+      become: yes
+      lineinfile:
+         path: /etc/screenrc
+         regexp: '^caption always'
+         line: 'caption always "%{rw} * | %H * $LOGNAME | %{bw}%c %D | %{-}%-Lw%{rw}%50>%{rW}%n%f* %t %{-}%+Lw%<"'
+
+    - name: configure bashrc with screen
+      blockinfile:
+        path: /home/vagrant/.bashrc
+        block: |
+           if [ "$TERM" != "screen" ] && [ "$SSH_CONNECTION" != "" ]; then
+             /usr/bin/screen -ls sshscreen || /usr/bin/screen -dmS sshscreen
+             echo "SSH no active"
+             /usr/bin/screen -S sshscreen -D -RR  && exit
+           fi
+
     - block:
-        - name: configure screen
-          become: yes
-          lineinfile:
-            path: /etc/screenrc
-            regexp: '^caption always'
-            line: 'caption always "%{rw} * | %H * $LOGNAME | %{bw}%c %D | %{-}%-Lw%{rw}%50>%{rW}%n%f* %t %{-}%+Lw%<"'
-
-        - name: configure bashrc with screen
-          blockinfile:
-            path: /home/vagrant/.bashrc
-            block: |
-              if [ "$TERM" != "screen" ] && [ "$SSH_CONNECTION" != "" ]; then
-                /usr/bin/screen -ls sshscreen || /usr/bin/screen -dmS sshscreen
-                echo "SSH no active"
-                /usr/bin/screen -S sshscreen -D -RR  && exit
-              fi
-
         - name: Ensure rdf directories exists
           file:
             path: "/home/vagrant/rdf/{{item}}"

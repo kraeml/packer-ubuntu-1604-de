@@ -14,7 +14,7 @@ desktop-bsa-pr-sa1:
 	DEBUG=true PR=SA_1 bin/box build ubuntu1604-desktop-de-PR virtualbox
 
 make-usb-pr:
-	DEBUG=true PR=KA bin/create-usb.sh
+	DEBUG=true PR=SA_1 bin/create-usb.sh
 
 make-usb:
 	DEBUG=true bin/create-usb.sh

@@ -16,9 +16,9 @@
         password: "passw0rd"
     - package_version:
         nodejs_version: 6.x
-        phantomjs_version: "2.1.3"
-        ruby_version: 2.5.0
-        molecule_version: '2.7'
+        phantomjs_version: "2.1.1"
+        ruby_version: 2.4.3
+        molecule_version: '2.7.0'
         vagrant: 2.0.2
         phpmyadmin: "4.7.7"
 
@@ -927,7 +927,12 @@
       block:
         - name: Install nodered
           become: yes
-          command: npm install -g --unsafe-perm node-red
+          command: npm install -g --unsafe-perm node-red node-red-admin
+          with_items:
+              - node-red
+              - node-red-admin
+              - node-red-node-mongodb2
+              - node-red-contrib-objectid
       tags:
         - node-red
         - nodejs

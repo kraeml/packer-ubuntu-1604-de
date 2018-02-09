@@ -17,10 +17,10 @@
     - package_version:
         nodejs_version: 6.x
         phantomjs_version: "2.1.1"
-        ruby_version: 2.4.2
-        molecule_version: '2.3.1'
-        vagrant: 2.0.1
-        phpmyadmin: "4.7.4"
+        ruby_version: 2.4.3
+        molecule_version: '2.7.0'
+        vagrant: 2.0.2
+        phpmyadmin: "4.7.7"
 
   roles:
     - role: geerlingguy.nfs
@@ -274,6 +274,7 @@
         - desktop
       firefox_language: 'de'
       firefox_os: 'linux-x86_64'
+      firefox_version: '58.0.1'
 
     - role: geerlingguy.java
       become: yes
@@ -532,6 +533,7 @@
         - avahi-daemon
         - avahi-utils
         - nmap
+        - whois
 
     - name: Install Python packages
       become: yes
@@ -541,6 +543,7 @@
       with_items:
         - pytest
         - pytest-pep8
+        - flask
       tags:
         - pythone-dev
 
@@ -920,107 +923,16 @@
         - db_mysql
         - phpmyadmin
 
-#    - name: Install jupyter
-#      block:
-#      - name: jupyter packages
-#        apt:
-#            name: "{{item}}"
-#            update_cache: yes
-#            cache_valid_time: 3600
-#        with_items:
-#          - libncurses5-dev
-#          - python-dev
-#          - python3-dev
-#          - python3-pip
-#          - pandoc
-#          - cmake
-#          - clang
-#          - llvm
-#          - llvm-dev
-#      - name: jupyter via pip
-#        pip:
-#            executable: pip3
-#            name: "{{item}}"
-#        with_items:
-#          - jupyter
-#          - readline
-#          - ipyparallel
-#          - bash_kernel
-#          - ipython-sql
-#          - ihtml
-#          - ExpectException
-#          - RISE
-#          - myhdl
-#          #- jupyter_c_kernel
-#
-#      - name: Insall bash kernel
-#        command: /usr/bin/python3 -m bash_kernel.install --sys-prefix
-
-##      - name: Install jupyter_c_kernel
-##        command: /usr/local/bin/install_c_kernel --sys-prefix
-#
-#      - name: Enable jupyter widgetsnbextension
-#        command: jupyter nbextension enable --py --sys-prefix widgetsnbextension
-#      - name: Get jupyter config script
-#        get_url:
-#            dest: /tmp/configure_jupyter.sh
-#            url: https://cloud.franken.de/owncloud/index.php/s/I6Vs9u803LAQZ9R/download
-#            owner: vagrant
-#            group: vagrant
-#            mode: 0774
-#      - name: Ensure jupyter config is set
-#        script: /tmp/configure_jupyter.sh
-#        args:
-#            creates: /home/vagrant/.jupyter/jupyter_notebook_config.py
-#        become: yes
-#        become_user: vagrant
-#      - name: Copy jupyter config
-#        become: yes
-#        get_url:
-#            url: https://cloud.franken.de/owncloud/index.php/s/xSQvKOHH64Z0W45/download
-#            dest: /lib/systemd/system/jupyter.service
-#            owner: root
-#            group: root
-#            mode: 0644
-#      - name: Enable Jupyter
-#        become: yes
-#        service:
-#            name: jupyter
-#            enabled: yes
-#      - name: Install js kernel
-#        become: yes
-#        npm:
-#            global: yes
-#            name: ijavascript
-#      - name: Install javascript kernel
-#        command: ijsinstall --install=global
-#        become: yes
-#
-#      - name: Ensure RISE installed
-#        become: yes
-#        command: jupyter-nbextension install rise --py --sys-prefix
-#        args:
-#          creates: /usr/local/share/jupyter/nbextensions/rise/
-#        register: jupyter_rise
-#
-#      - name: Ensure RISE enabled
-#        become: yes
-#        command: jupyter-nbextension enable rise --py --sys-prefix
-#        when: jupyter_rise.changed
-#
-#      - name: Restart Jupyter
-#        become: yes
-#        service:
-#            name: jupyter
-#            state: restarted
-#      tags:
-#        - jupyter
-
     - name: Node-red block
       block:
         - name: Install nodered
           become: yes
-          command: npm install -g --unsafe-perm node-red
+          command: npm install -g --unsafe-perm node-red node-red-admin
+          with_items:
+              - node-red
+              - node-red-admin
+              - node-red-node-mongodb2
+              - node-red-contrib-objectid
       tags:
         - node-red
         - nodejs

@@ -16,3 +16,4 @@ ssh.config
 roles
 venv
 VERSION.bak
+tmp

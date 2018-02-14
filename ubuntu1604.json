@@ -91,7 +91,9 @@
             "vm_name": "packer-ubuntu-16.04-amd64",
             "vboxmanage": [
                 ["modifyvm", "{{.Name}}", "--memory", "{{user `memory`}}"],
-                ["modifyvm", "{{.Name}}", "--cpus", "{{user `cpus`}}"]
+                ["modifyvm", "{{.Name}}", "--cpus", "{{user `cpus`}}"],
+                ["modifyvm", "{{.Name}}", "--clipboard", "bidirectional"],
+                ["modifyvm", "{{.Name}}", "--vram", "32"]
             ]
         },
         {

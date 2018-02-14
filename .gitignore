@@ -17,3 +17,4 @@ roles
 venv
 VERSION.bak
 tmp
+packer-ubuntu-16.04-amd64-vmware/

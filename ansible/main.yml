@@ -731,72 +731,66 @@
         - ghdl
         - electronic
         - desktop
-# LXC
-    - name: Install ppa lxc
-      become: yes
-      apt_repository:
-        repo: ppa:ubuntu-lxc/lxc-stable
-        state: present # A source string state.
-        update_cache: yes
-      tags:
-        - lxc-dev
 
-    - name: "Install lxc-dev needed packages"
-      become: yes
-      apt:
-        name: "{{ item }}"
-        state: installed
-        update_cache: yes
-        cache_valid_time: 3600
-      with_items:
-        - lxc
-        - lxd
-        - zfsutils-linux
-        - debootstrap
-        - bridge-utils
-        - yum
-        - rpm
-        # - zypper
-        - qemu-user-static
-      tags:
-        - lxc-dev
+    - block:
+      - name: Install ppa lxc
+        become: yes
+        apt_repository:
+          repo: ppa:ubuntu-lxc/lxc-stable
+          state: present # A source string state.
+          update_cache: yes
 
-    - name: "Extend ubuntu template"
-      become: yes
-      replace:
-          regexp: "apt-transport-https,ssh,vim"
-          # The regular expression to look for in the contents of the file.
-          # Uses Python regular expressions;
-          # see U(http://docs.python.org/2/library/re.html).
-          # Uses multiline mode, which means C(^) and C($) match the beginning
-          # and end respectively of I(each line) of the file.
-          dest: "/usr/local/share/lxc/templates/lxc-ubuntu"
-          # The file to modify.
-          replace: "apt-transport-https,ssh,vim,manpages,man-db,bash-completion,whois,python,python-apt"
-      ignore_errors: yes
-      tags:
-        - lxc-dev
-    - name: Create a stopped container
-      become: yes
-      lxc_container:
-        name: "{{container_prefix}}{{item}}"
-        container_log: true
-        template: "{{item}}"
-        state: stopped
-      with_items: "{{lxc_templates}}"
-      ignore_errors: yes
-      tags:
-        - lxc-dev
+      - name: "Install lxc-dev needed packages"
+        become: yes
+        apt:
+          name: "{{ item }}"
+          state: installed
+          update_cache: yes
+          cache_valid_time: 3600
+        with_items:
+          - lxc
+          - python-lxc
+          - lxd
+          - zfsutils-linux
+          - debootstrap
+          - bridge-utils
+          - yum
+          - rpm
+          # - zypper
+          - qemu-user-static
 
-    - name: Remove container
-      become: yes
-      lxc_container:
-        name: "{{container_prefix}}{{item}}"
-        container_log: true
-        template: "{{item}}"
-        state: absent
-      with_items: "{{lxc_templates}}"
-      ignore_errors: yes
+      - name: "Extend ubuntu template"
+        become: yes
+        replace:
+            regexp: "apt-transport-https,ssh,vim"
+            # The regular expression to look for in the contents of the file.
+            # Uses Python regular expressions;
+            # see U(http://docs.python.org/2/library/re.html).
+            # Uses multiline mode, which means C(^) and C($) match the beginning
+            # and end respectively of I(each line) of the file.
+            dest: "/usr/share/lxc/templates/lxc-ubuntu"
+            # The file to modify.
+            replace: "apt-transport-https,ssh,vim,manpages,man-db,bash-completion,whois,python,python-apt"
+
+      - name: Create a stopped container
+        become: yes
+        lxc_container:
+          name: "{{container_prefix}}{{item}}"
+          container_log: true
+          template: "{{item}}"
+          state: stopped
+        with_items: "{{lxc_templates}}"
+        ignore_errors: yes
+
+      - name: Remove container
+        become: yes
+        lxc_container:
+          name: "{{container_prefix}}{{item}}"
+          container_log: true
+          template: "{{item}}"
+          state: absent
+        with_items: "{{lxc_templates}}"
+        ignore_errors: yes
       tags:
         - lxc-dev
 

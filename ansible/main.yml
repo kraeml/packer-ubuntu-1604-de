@@ -749,15 +749,28 @@
           cache_valid_time: 3600
         with_items:
           - lxc
-          - python-lxc
           - lxd
+          - python-lxc
+          - openvswitch-switch
+          - lvm2
+          - btrfs-tools
           - zfsutils-linux
+          - libvirt-bin
+          - python-libvirt
+          - python3-libvirt
+          - virtinst
+          - cgmanager
+          - cgroup-lite
           - debootstrap
           - bridge-utils
           - yum
           - rpm
           # - zypper
           - qemu-user-static
+          - haproxy
+          - open-iscsi
+          - redis-server
+          - rabbitmq-server
 
       - name: "Extend ubuntu template"
         become: yes

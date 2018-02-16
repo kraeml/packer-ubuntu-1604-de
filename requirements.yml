@@ -14,7 +14,7 @@
 - src: toopy.lxc-dev
 - src: gantsign.keyboard
 - src: gantsign.lightdm
-- src: https://github.com/gantsign/ansible-role-xdesktop/archive/2.2.0.tar.gz
+- src: https://github.com/gantsign/ansible-role-xdesktop/archive/2.2.3.tar.gz
   name: gantsign.xdesktop
 - src: gantsign.terminator
 - src: tschifftner.firefox

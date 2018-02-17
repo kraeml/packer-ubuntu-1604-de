@@ -545,6 +545,10 @@
         - pytest
         - pytest-pep8
         - flask
+        - matplotlib
+        - numpy
+        - scipy
+        - music21
       tags:
         - pythone-dev
 
@@ -884,6 +888,9 @@
               version: master
             - repo: python_routine_aufgaben
               path: itec
+              version: master
+            - repo: hands-on-lxc
+              path: ais
               version: master
 
         - name: OWC File Transfer

@@ -760,6 +760,7 @@
           - btrfs-tools
           - zfsutils-linux
           - libvirt-bin
+          - libvirt-dev
           - python-libvirt
           - python3-libvirt
           - virtinst

@@ -39,6 +39,6 @@ test-ansible: galaxy
 full-ansible: galaxy
 	ansible-playbook -vvv -i localhost, -e ansible_connection=local --skip-tags=packer ansible/main.yml
 no-nodejs-ansible: galaxy
-	ansible-playbook -vvv -i localhost, -e ansible_connection=local --skip-tags=packer,nodejs ansible/main.yml
+	ansible-playbook -i localhost, -e ansible_connection=local --skip-tags=packer,nodejs ansible/main.yml
 todo-ansible: galaxy
-	ansible-playbook -vvv -i localhost, -e ansible_connection=local --skip-tags=packer --tags=todo ansible/main.yml
+	ansible-playbook -vvv -i localhost, -e ansible_connection=local --skip-tags=packer,nodejs --tags=todo ansible/main.yml

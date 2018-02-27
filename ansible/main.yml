@@ -637,6 +637,7 @@
             - libqt5sql5
             - libqt5sql5-sqlite
             - libqt5xml5
+            - xclip
 
         - name: Clone ghdl
           git:
@@ -678,7 +679,6 @@
           with_items:
             - arduino
             - fritzing
-
         - name: Get Fritzing
           become: yes
           unarchive:
@@ -708,6 +708,87 @@
               # Specify additional options by passing in an array.
               creates: /opt/arduino/arduino
           register: arduino
+        - name: Installation prerequisites for Linux for mystorm
+          become: yes
+          apt:
+            name: "{{item}}"
+            cache_valid_time: 3600
+          with_items:
+            - build-essential
+            - clang
+            - bison
+            - flex
+            - libreadline-dev
+            - gawk
+            - tcl-dev
+            - libffi-dev
+            - git
+            - mercurial
+            - graphviz
+            - xdot
+            - pkg-config
+            - python
+            - python3
+            - libftdi-dev
+            - vim
+            - htop
+            - screen
+            - iverilog
+        - name: Create hidden bin
+          file:
+            path: "{{ansible_user_dir}}/.bin/icestudio"
+            state: directory
+        - name: Downloading of IceStorm for linux
+          git:
+            dest: "{{ansible_user_dir}}/.bin/{{item.dest}}"
+            repo: "{{item.repo}}"
+          with_items:
+            - repo: https://github.com/cliffordwolf/icestorm.git
+              dest: icestorm
+            - repo: https://github.com/cseed/arachne-pnr.git
+              dest: arachne-pnr
+            - repo: https://github.com/cliffordwolf/yosys.git
+              dest: yosys
+        - name: Downloading mystorm tutorial
+          git:
+            dest: "{{ansible_user_dir}}/Dokumente/{{item.dest}}"
+            repo: "{{item.repo}}"
+          with_items:
+            - repo: https://github.com/mystorm-org/Guide.git
+              dest: mystorm-Guide
+            - repo: https://github.com/mystorm-org/BlackIce-II.git
+              dest: BlackIce-II
+        - name: Makeing of IceStorm for linux
+          make:
+            target: -j8
+            chdir: "{{ansible_user_dir}}/.bin/{{item}}"
+          with_items:
+            - icestorm
+            - arachne-pnr
+            - yosys
+        - name: Instalation of IceStorm for linux
+          become: yes
+          make:
+            target: install
+            chdir: "{{ansible_user_dir}}/.bin/{{item}}"
+          with_items:
+            - icestorm
+            - arachne-pnr
+            - yosys
+        - name: Get icestudio IDE
+          unarchive:
+              src: https://github.com/FPGAwars/icestudio/releases/download/0.3.2-beta/icestudio-0.3.2-beta-linux64.zip
+              # If remote_src=no (default), local path to archive file to copy to the target server; can be absolute or relative. If remote_src=yes, path on the target server to existing archive file to unpack.,If remote_src=yes and src contains ://, the remote machine will download the file from the url first. (version_added 2.0)
+              dest: "{{ansible_user_dir}}/.bin/icestudio"
+              # Remote absolute path where the archive should be unpacked
+              group: # name of the group that should own the file/directory, as would be fed to I(chown)
+              remote_src: yes
+              # Set to C(yes) to indicate the archived file is already on the remote system and not local to the Ansible controller.,This option is mutually exclusive with C(copy).
+              #extra_opts:
+              #  - "--strip-components=1"
+              # Specify additional options by passing in an array.
+              creates: "{{ansible_user_dir}}/.bin/icestudio/icestudio-0.3.2-beta-linux64"
+          register: icestudio
         - name: Create electronic links
           become: yes
           file:
@@ -723,6 +804,17 @@
           become: yes
           command: /opt/arduino/install.sh
           when: arduino.changed
+        - get_url:
+            dest: /tmp/linux_installer.sh
+            url: https://raw.githubusercontent.com/FPGAwars/icestudio/develop/scripts/linux_installer.sh
+            mode: 0760
+        - name: Install icestudio on desktop
+          expect:
+            command: /tmp/linux_installer.sh
+            responses:
+              Enter the Icestudio path: "{{ansible_user_dir}}/.bin/icestudio/icestudio-0.3.2-beta-linux64"
+            creates: "{{ansible_user_dir}}/.local/share/applications/icestudio.desktop"
+            timeout: 30
         - name: Member of dialout
           become: yes
           user:
@@ -731,10 +823,14 @@
               # Puts the user in this comma-delimited list of groups. When set to the empty string ('groups='), the user is removed from all groups except the primary group.
               append: yes
               # If C(yes), will only add groups, not set them to just the list in I(groups).
+        - name: Right for user
+          become: yes
+          command: "chown -R {{ansible_user_id}}:{{ansible_user_gid}} {{ansible_user_dir}}/"
       tags:
         - ghdl
         - electronic
         - desktop
+        - todo
 
     - block:
       - name: Install ppa lxc

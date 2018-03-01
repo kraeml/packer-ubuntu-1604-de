@@ -19,6 +19,11 @@
             "destination": "/tmp/OnlinePythonTutor.ini"
         },
         {
+            "type": "file",
+            "source": "ansible/fritzing.desktop",
+            "destination": "/tmp/fritzing.desktop"
+        },
+        {
             "type": "ansible-local",
             "playbook_file": "ansible/main.yml",
             "galaxy_file": "requirements.yml",

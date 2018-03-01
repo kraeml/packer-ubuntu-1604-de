@@ -72,39 +72,6 @@
           rom: 'rebase origin/master'
       tags:
         - git
-#    # Add lcx development
-#    - role: cmprescott.dnsmasq
-#      become: yes
-#      dnsmasq_dns_interfaces: []
-#      tags:
-#        - lxc-dev
-#    - role: toopy.lxc-dev
-#      become: yes
-#      lxc_config_path: "/var/lib/lxc/"
-#      lxc_dev_system_packages:
-#        - name: automake
-#        - name: debootstrap
-#        - name: git
-#        - name: libcap-dev
-#        - name: libtool
-#        - name: make
-#        - name: pkg-config
-#        - name: python-dev
-#        - name: python-pip
-#        - name: resolvconf
-#        - name: libapparmor-dev
-#        - name: libseccomp-dev
-#        - name: python3-dev
-#        - name: python3-setuptools
-#        - name: docbook2x
-#        - name: libgnutls-dev
-#        - name: liblua5.2-dev
-#        - name: libselinux1-dev
-#        - name: libcgmanager-dev
-#        - name: gcc
-#        - name: clang
-#      tags:
-#        - lxc-dev
 
     # Add Node.js
     - role: geerlingguy.nodejs
@@ -638,12 +605,16 @@
             - libqt5sql5-sqlite
             - libqt5xml5
             - xclip
-
+        - name: Lookup for ghdl
+          stat:
+            path: /usr/local/bin/ghdl
+          register: ghdl
         - name: Clone ghdl
           git:
               dest: /tmp/ghdl
-              repo: https://github.com/tgingold/ghdl.git
+              repo: https://github.com/ghdl/ghdl.git
           register: ghdl_clone
+          when: ghdl.stat.exists == False
 
         - name: Create build in ghdl
           file:
@@ -656,21 +627,24 @@
           args:
               chdir: /tmp/ghdl/build
           when: ghdl_clone.changed
-
         - name: Make ghdl
           become: yes
           command: '/bin/bash -l -c /usr/bin/make'
           args:
               chdir: /tmp/ghdl/build
           when: ghdl_clone.changed
-
         - name: Make install ghdl
           become: yes
           command: make install
           args:
               chdir: /tmp/ghdl/build
           when: ghdl_clone.changed
-
+        - name: Link to ghdl
+          become: yes
+          file:
+            src: /opt/ghdl/bin/ghdl
+            dest: /usr/local/bin/ghdl
+            state: link
         - name: Create electronic dirs
           become: yes
           file:
@@ -693,6 +667,14 @@
                 - "--strip-components=1"
               # Specify additional options by passing in an array.
               creates: /opt/fritzing/Fritzing
+        - name: Create applications directory
+          file:
+            path: "{{ansible_user_dir}}/.local/share/applications/"
+            state: directory
+        - name: Install Fritzing desktop
+          template:
+            dest: "{{ansible_user_dir}}/.local/share/applications/fritzing.desktop"
+            src: /tmp/fritzing.desktop
         - name: Get arduino IDE
           become: yes
           unarchive:
@@ -749,6 +731,16 @@
               dest: arachne-pnr
             - repo: https://github.com/cliffordwolf/yosys.git
               dest: yosys
+            - repo: https://github.com/myhdl/myhdl.git
+              dest: myhdl
+        - name: Install myhdl
+          become: yes
+          command: python3 setup.py install
+          args:
+            creates: "/usr/local/lib/python3.5/dist-packages/{{item}}*"
+            chdir: "{{ansible_user_dir}}/.bin/{{item}}"
+          with_items:
+            - myhdl
         - name: Downloading mystorm tutorial
           git:
             dest: "{{ansible_user_dir}}/Dokumente/{{item.dest}}"
@@ -760,20 +752,46 @@
               dest: BlackIce-II
         - name: Makeing of IceStorm for linux
           make:
-            target: -j8
             chdir: "{{ansible_user_dir}}/.bin/{{item}}"
           with_items:
             - icestorm
-            - arachne-pnr
-            - yosys
+          register: icestorm
         - name: Instalation of IceStorm for linux
           become: yes
           make:
             target: install
             chdir: "{{ansible_user_dir}}/.bin/{{item}}"
+          when: icestorm.changed
           with_items:
             - icestorm
+        - name: Makeing II of IceStorm for linux
+          make:
+            chdir: "{{ansible_user_dir}}/.bin/{{item}}"
+          register: arachne
+          with_items:
             - arachne-pnr
+        - name: Install II of IceStorm for linux
+          become: yes
+          make:
+            target: install
+            chdir: "{{ansible_user_dir}}/.bin/{{item}}"
+          when: arachne.changed
+          with_items:
+            - arachne-pnr
+        - name: Makeing III of IceStorm for linux
+          make:
+            target: all
+            chdir: "{{ansible_user_dir}}/.bin/{{item}}"
+          register: yosys
+          with_items:
+            - yosys
+        - name: Install III of IceStorm for linux
+          become: yes
+          make:
+            target: install
+            chdir: "{{ansible_user_dir}}/.bin/{{item}}"
+          when: yosys.changed
+          with_items:
             - yosys
         - name: Get icestudio IDE
           unarchive:
@@ -830,7 +848,6 @@
         - ghdl
         - electronic
         - desktop
-        - todo
 
     - block:
       - name: Install ppa lxc
@@ -1017,7 +1034,6 @@
             #  dest: itec/
       tags:
         - rdf
-        #- todo
 
     - block:
         - name: Install phpmyadmin

@@ -16,13 +16,16 @@ desktop-bsa-pr-sa1:
 make-usb-pr:
 	DEBUG=true PR=SA_1 bin/create-usb.sh
 
-make-usb:
+make-usb-small:
 	DEBUG=true bin/create-usb.sh
+
+make-usb-full:
+	DEBUG=true SCHUELER=true bin/create-usb.sh
 
 make-ka:
 	#rm -rf ka-sa-pr-build/* || true
 	mkdir -p ka-sa-pr-build/builds || true
-	rsync -av --human-readable builds/*KA* ka-sa-pr-build/builds
+	rsync -av --progress --human-readable builds/*KA* ka-sa-pr-build/builds
 	mv ka-sa-pr-build/builds/Vagrantfile.KA* ka-sa-pr-build/Vagrantfile
 	mv ka-sa-pr-build/builds/Makefile.KA* ka-sa-pr-build/Makefile
 	sed -i 's/    /\t/g' ka-sa-pr-build/Makefile
@@ -41,4 +44,5 @@ full-ansible: galaxy
 no-nodejs-ansible: galaxy
 	ansible-playbook -i localhost, -e ansible_connection=local --skip-tags=packer,nodejs ansible/main.yml
 todo-ansible: galaxy
-	ansible-playbook -vvv -i localhost, -e ansible_connection=local --skip-tags=packer,nodejs --tags=todo ansible/main.yml
+	cp ansible/fritzing.desktop /tmp/fritzing.desktop
+	ansible-playbook -i localhost, -e ansible_connection=local --skip-tags=packer,nodejs --tags=todo ansible/main.yml

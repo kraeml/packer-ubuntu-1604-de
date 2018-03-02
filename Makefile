@@ -1,5 +1,5 @@
 desktop:
-	TMPDIR=/home/michl/tmp bin/box build ubuntu1604-desktop-de
+	TMPDIR=/home/michl/tmp bin/box build ubuntu1604-desktop-de virtualbox
 
 desktop-virtualbox:
 	TMPDIR=/home/michl/tmp bin/box build ubuntu1604-desktop-de virtualbox

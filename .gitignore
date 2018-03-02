@@ -5,7 +5,7 @@ iso/*
 .vagrant
 ansible/main.retry
 output-virtualbox-iso
-downloads/
+downloads*
 gitlab/
 builds/*
 ka-sa-pr-build/

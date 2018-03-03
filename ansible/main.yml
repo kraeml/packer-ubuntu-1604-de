@@ -519,6 +519,10 @@
       tags:
         - pythone-dev
 
+    - name: Jupytelab extensions
+      become: yes
+      command: jupyter labextension install jupyterlab-drawio
+
     - name: Git config
       git_config:
         name: "{{item.name}}"

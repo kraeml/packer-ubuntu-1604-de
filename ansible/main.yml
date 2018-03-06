@@ -720,6 +720,7 @@
             - htop
             - screen
             - iverilog
+            - wine
         - name: Create hidden bin
           file:
             path: "{{ansible_user_dir}}/.bin/icestudio"
@@ -905,7 +906,7 @@
             # and end respectively of I(each line) of the file.
             dest: "/usr/share/lxc/templates/lxc-ubuntu"
             # The file to modify.
-            replace: "apt-transport-https,ssh,vim,manpages,man-db,bash-completion,whois,python,python-apt"
+            replace: "apt-transport-https,ssh,vim,manpages,man-db,bash-completion,whois,python,python-apt,dnsutils"
 
       - name: Create a stopped container
         become: yes

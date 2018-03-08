@@ -41,16 +41,25 @@ Vagrant.configure("2") do |config|
       "draganddrop" => "bidirectional",
       "audio" => default_vb_audio,
       "audiocontroller" => default_vb_audiocontroler
+    },
+    "rdf" => {
+      "insert_key" => false,
+      "hostname"  => "rdf-dev",
+      "private_network_ip" => "172.22.3.2",
+      "private_network_dummy_ip" => "192.168.22.2"
     }
   }
 
   config.vm.define "rdf" do |rdf|
-    rdf.ssh.insert_key = false
-    rdf.vm.hostname = "rdf-dev"
-    rdf.vm.box = "file://builds/virtualbox-ubuntu1604-RDF-18.03.06-14.box"
-    rdf.vm.network :private_network, ip: "172.22.3.2"
+    rdf.ssh.insert_key = config.user.rdf.insert_key
+    rdf.vm.hostname = config.user.rdf.hostname
+    rdf.vm.box = "file://builds/virtualbox-ubuntu1604-RDF-18.03.08-15.box"
+    rdf.vm.network :private_network, ip: config.user.rdf.private_network_ip
+    rdf.vm.network :private_network, ip: config.user.rdf.private_network_dummy_ip
 
     rdf.vm.provider :virtualbox do |vb|
+      # Enable the VM's virtual USB controller & enable the virtual USB 2.0 controller
+      vb.customize ["modifyvm", :id, "--usb", "on", "--usbehci", "on"]
       # Give the VM a name
       vb.name = config.user.virtualbox.name
       # Display the VirtualBox GUI when booting the machine

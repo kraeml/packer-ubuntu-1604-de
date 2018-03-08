@@ -442,13 +442,13 @@
       tags:
         - docker
 
-    # Install Kubernetes
-    - role: gantsign.kubernetes
-      become: yes
-      tags:
-        - kubernetes
-        - docker
-      kubernetes_node_type: admin
+#    # Install Kubernetes
+#    - role: gantsign.kubernetes
+#      become: yes
+#      tags:
+#        - kubernetes
+#        - docker
+#      kubernetes_node_type: admin
 
     # Install Molecule for testing Ansible roles & playbooks
     - role: gantsign.molecule
@@ -502,6 +502,7 @@
         - avahi-utils
         - nmap
         - whois
+        - proftpd-basic
 
     - name: Install Python packages
       become: yes
@@ -518,10 +519,6 @@
         - music21
       tags:
         - pythone-dev
-
-    - name: Jupytelab extensions
-      become: yes
-      command: jupyter labextension install jupyterlab-drawio
 
     - name: Git config
       git_config:

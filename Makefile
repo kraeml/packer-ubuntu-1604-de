@@ -42,6 +42,7 @@ test-ansible: galaxy
 full-ansible: galaxy
 	ansible-playbook -vvv -i localhost, -e ansible_connection=local --skip-tags=packer ansible/main.yml
 no-nodejs-ansible: galaxy
+	cp ansible/fritzing.desktop /tmp/fritzing.desktop
 	ansible-playbook -i localhost, -e ansible_connection=local --skip-tags=packer,nodejs ansible/main.yml
 todo-ansible: galaxy
 	cp ansible/fritzing.desktop /tmp/fritzing.desktop

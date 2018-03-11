@@ -99,7 +99,9 @@
                 ["modifyvm", "{{.Name}}", "--cpus", "{{user `cpus`}}"],
                 ["modifyvm", "{{.Name}}", "--clipboard", "bidirectional"],
                 ["modifyvm", "{{.Name}}", "--vram", "32"]
-            ]
+            ],
+            "hard_drive_interface": "sata",
+            "sata_port_count": 6
         },
         {
             "type": "vmware-iso",

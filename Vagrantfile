@@ -57,6 +57,7 @@ Vagrant.configure("2") do |config|
   config.persistent_storage.filesystem = 'ext4'
   config.persistent_storage.mountpoint = '/var/persistent'
   config.persistent_storage.volgroupname = 'persist-vg'
+  config.persistent_storage.diskdevice = '/dev/sde'
 
   config.vm.define "rdf" do |rdf|
     # Use persistent APT cache
@@ -74,7 +75,7 @@ Vagrant.configure("2") do |config|
 SCRIPT
     rdf.ssh.insert_key = config.user.rdf.insert_key
     rdf.vm.hostname = config.user.rdf.hostname
-    rdf.vm.box = "file://builds/virtualbox-ubuntu1604-RDF-18.03.11-18.box"
+    rdf.vm.box = "file://builds/virtualbox-ubuntu1604-RDF-18.03.08-15.box"
     rdf.vm.network :private_network, ip: config.user.rdf.private_network_ip
     rdf.vm.network :private_network, ip: config.user.rdf.private_network_dummy_ip
 
@@ -125,7 +126,7 @@ SCRIPT
       vb.customize [
         "storageattach", :id,
         "--storagectl", "SATA Controller",
-        "--port", 2, "--device", 0,
+        "--port", 1, "--device", 0,
         "--type", "hdd", "--medium", file_to_disk]
 
       file_to_disk = File.join(vagrant_dir, ".vagrant/persistent-disk2.vdi")
@@ -134,7 +135,7 @@ SCRIPT
       end
       vb.customize ["storageattach", :id,
         "--storagectl", "SATA Controller",
-        "--port", 3, "--device", 0,
+        "--port", 2, "--device", 0,
         "--type", "hdd", "--medium", file_to_disk]
 
       file_to_disk = File.join(vagrant_dir, ".vagrant/persistent-disk3.vdi")
@@ -143,7 +144,7 @@ SCRIPT
       end
       vb.customize ["storageattach", :id,
         "--storagectl", "SATA Controller",
-        "--port", 4, "--device", 0,
+        "--port", 3, "--device", 0,
         "--type", "hdd", "--medium", file_to_disk]
     end
 

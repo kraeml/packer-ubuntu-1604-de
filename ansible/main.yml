@@ -924,6 +924,10 @@
           state: absent
         with_items: "{{lxc_templates}}"
         ignore_errors: yes
+      - name: Clone web panel
+        git:
+          dest: "{{ansible_user_dir}}/rdf/bsa/lxc-web-panel"
+          repo: https://github.com/claudyus/LXC-Web-Panel.git
       tags:
         - lxc-dev
 

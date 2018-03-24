@@ -928,8 +928,44 @@
         git:
           dest: "{{ansible_user_dir}}/rdf/bsa/lxc-web-panel"
           repo: https://github.com/claudyus/LXC-Web-Panel.git
+      - name: Install lxc web panel dependencies
+        become: yes
+        apt:
+          name: "{{item}}"
+        with_items:
+          - python-tz
+          - libsasl2-dev
+          - libldap2-dev
+      - name: build lxc web pannel
+        command: fab build_assets
+        args:
+          chdir: "{{ansible_user_dir}}/rdf/bsa/lxc-web-panel"
+      - name: build lxc web pannel partII
+        become: yes
+        command: ./setup.py develop
+        args:
+          chdir: "{{ansible_user_dir}}/rdf/bsa/lxc-web-panel"
+      - name: Create file for lxc web pannel
+        become: yes
+        file:
+          path: "/{{item}}/lwp"
+          state: directory
+        with_items:
+          - etc
+          - var
+      - name: Copy files
+        become: yes
+        copy:
+          src: "{{item.src}}"
+          dest: "{{item.dest}}"
+        with_items:
+          - src: "{{ansible_user_dir}}/rdf/bsa/lxc-web-panel/lwp.example.conf"
+            dest: /etc/lwp/lwp.conf
+          - src: "{{ansible_user_dir}}/rdf/bsa/lxc-web-panel/lwp.db"
+            dest: /var/lwp/lwp.db
       tags:
         - lxc-dev
+        - todo
 
     - block:
         - name: pull an docker images

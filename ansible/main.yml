@@ -965,7 +965,6 @@
             dest: /var/lwp/lwp.db
       tags:
         - lxc-dev
-        - todo
 
     - block:
         - name: pull an docker images

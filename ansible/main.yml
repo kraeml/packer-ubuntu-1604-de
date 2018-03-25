@@ -936,6 +936,9 @@
           - python-tz
           - libsasl2-dev
           - libldap2-dev
+          - fabric
+          - python-pam
+          - python-flask
       - name: build lxc web pannel
         command: fab build_assets
         args:
@@ -1016,6 +1019,7 @@
 
     - block:
         - name: Ensure rdf directories exists
+          become: yes
           file:
             path: "/home/vagrant/rdf/{{item}}"
             state: directory

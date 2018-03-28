@@ -204,8 +204,8 @@
             - autocomplete-ansible
             - linter-ansible-linting
             - platformio-ide-terminal
-            - platformio-ide
-            - platformio-ide-debugger
+            #- platformio-ide
+            #- platformio-ide-debugger
           atom_config:
             "*":
               core:

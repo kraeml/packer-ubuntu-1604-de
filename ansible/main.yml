@@ -503,6 +503,7 @@
         - nmap
         - whois
         - proftpd-basic
+        - ipcalc
 
     - name: Install Python packages
       become: yes
@@ -868,7 +869,7 @@
           cache_valid_time: 3600
         with_items:
           - lxc
-          #- lxd
+          - lxd
           - python-lxc
           - openvswitch-switch
           - lvm2
@@ -891,6 +892,7 @@
           - open-iscsi
           - redis-server
           - rabbitmq-server
+          - dnsmasq
 
       - name: "Extend ubuntu template"
         become: yes

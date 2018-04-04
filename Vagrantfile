@@ -46,7 +46,7 @@ Vagrant.configure("2") do |config|
     "rdf" => {
       "insert_key" => false,
       "hostname"  => "rdf-dev",
-      "private_network_ip" => "172.22.3.2",
+      "private_network_ip" => "192.168.3.2",
       "private_network_dummy_ip" => "192.168.22.2"
     }
   }
@@ -76,7 +76,7 @@ Vagrant.configure("2") do |config|
 #SCRIPT
     rdf.ssh.insert_key = config.user.rdf.insert_key
     rdf.vm.hostname = config.user.rdf.hostname
-    rdf.vm.box = "file://builds/virtualbox-ubuntu1604-SA_2-18.03.28-15.box"
+    rdf.vm.box = "file://builds/virtualbox-ubuntu1604-SA_2-18.04.04-16.box"
     rdf.vm.network :private_network, ip: config.user.rdf.private_network_ip
     rdf.vm.network :private_network, ip: config.user.rdf.private_network_dummy_ip
 

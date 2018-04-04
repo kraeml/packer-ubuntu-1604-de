@@ -503,6 +503,7 @@
         - nmap
         - whois
         - proftpd-basic
+        - ipcalc
 
     - name: Install Python packages
       become: yes
@@ -891,6 +892,7 @@
           - open-iscsi
           - redis-server
           - rabbitmq-server
+          - dnsmasq
 
       - name: "Extend ubuntu template"
         become: yes
@@ -903,7 +905,7 @@
             # and end respectively of I(each line) of the file.
             dest: "/usr/share/lxc/templates/lxc-ubuntu"
             # The file to modify.
-            replace: "apt-transport-https,ssh,vim,manpages,man-db,bash-completion,whois,python,python-apt,dnsutils"
+            replace: "apt-transport-https,ssh,vim,manpages,man-db,bash-completion,whois,python,python-apt,dnsutils,nginx,mongodb,python-flask"
 
       - name: Create a stopped container
         become: yes

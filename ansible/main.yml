@@ -868,7 +868,7 @@
           cache_valid_time: 3600
         with_items:
           - lxc
-          - lxd
+          #- lxd
           - python-lxc
           - openvswitch-switch
           - lvm2
@@ -903,7 +903,7 @@
             # and end respectively of I(each line) of the file.
             dest: "/usr/share/lxc/templates/lxc-ubuntu"
             # The file to modify.
-            replace: "apt-transport-https,ssh,vim,manpages,man-db,bash-completion,whois,python,python-apt,dnsutils"
+            replace: "apt-transport-https,ssh,vim,manpages,man-db,bash-completion,whois,python,python-apt,dnsutils,nginx,mongodb,python-flask"
 
       - name: Create a stopped container
         become: yes

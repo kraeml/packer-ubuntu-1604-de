@@ -487,9 +487,13 @@
         - sqlite
         - lvm2
         - python3
+        - python
         - python3-pip
+        - python-pip
         - python3-virtualenv
+        - python-virtualenv
         - python3-dev
+        - python-dev
         - python3-pexpect
         - python-pexpect
         - python3-winrm
@@ -504,6 +508,7 @@
         - whois
         - proftpd-basic
         - ipcalc
+        - dnsutils
 
     - name: Install Python packages
       become: yes
@@ -518,8 +523,10 @@
         - numpy
         - scipy
         - music21
+        - boto3
+        - botocore
       tags:
-        - pythone-dev
+        - python-dev
 
     - name: Git config
       git_config:

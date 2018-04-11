@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [ -z $2 ]
+then
+	COMMAND=$1
+	VAGRANT_PATH=""
+else
+	COMMAND=$2
+	VAGRANT_PATH=vagrant-$1/
+fi
+cd ~/Dokumente/Schule/Bento-Boxen/packer-ubuntu-1604-de/$VAGRANT_PATH
+if [ $COMMAND == "neu" ]
+then
+	vagrant destroy --force
+	vagrant up rdf
+else
+	vagrant $COMMAND rdf
+fi
+cd -

@@ -1,18 +1,26 @@
 #!/bin/bash
-
+set -x
+VAGRANT_BUILD_PATH=~/Dokumente/Schule/Bento-Boxen/packer-ubuntu-1604-de
 if [ -z $2 ]
 then
 	COMMAND=$1
-	VAGRANT_PATH=""
 else
 	COMMAND=$2
-	VAGRANT_PATH=vagrant-$1/
+	VAGRANT_PATH=$VAGRANT_BUILD_PATH/vagrant-$1/
 fi
-cd ~/Dokumente/Schule/Bento-Boxen/packer-ubuntu-1604-de/$VAGRANT_PATH
+cd $VAGRANT_PATH
 if [ $COMMAND == "neu" ]
 then
 	vagrant destroy --force
-	vagrant up rdf
+	if [ -z $2 ]
+	then
+		vagrant up rdf
+	else
+		cd $VAGRANT_BUILD_PATH
+		ansible-playbook ansible-local/playbook.yml  --extra-vars="type=$1"
+		cd -
+		vagrant up rdf
+	fi
 else
 	vagrant $COMMAND rdf
 fi

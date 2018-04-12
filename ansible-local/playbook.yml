@@ -6,6 +6,7 @@
     vagrant_pre: "{{type}}"
     version: "{{ lookup('file', '../VERSION') }}"
     path: ../vagrant-{{type}}
+    build_path: ../builds
 
   pre_tasks:
     - name: Setze Variablen Falls SA_x oder PR
@@ -26,7 +27,7 @@
       block:
         - name: Finde jüngste Vagrantfile
           find:
-            paths: "../builds"
+            paths: "{{build_path}}"
             patterns: 'Vagrantfile.{{vagrant_pre}}*'
             #use_regex: yes
           register: found_vagrantfiles
@@ -64,11 +65,15 @@
       ignore_errors: yes
 
   tasks:
-    - name: Kopiere Vagrantfile ../builds/Vagrantfile.{{vagrant_pre}}-{{version}}
+    - name: Kopiere Vagrantfile {{build_path}}/Vagrantfile.{{vagrant_pre}}-{{version}}
       copy:
         dest: "{{path}}/Vagrantfile"
-        src: ../builds/Vagrantfile.{{vagrant_pre}}-{{version}}
-
+        src: "{{build_path}}/Vagrantfile.{{vagrant_pre}}-{{version}}"
+    - name: Link zu ../build erstellen
+      file:
+        path: "{{path}}/builds"
+        src: "{{build_path}}"
+        state: link
     - name: Manipulate Vagrantfile
       replace:
         path: "{{path}}/Vagrantfile"
@@ -77,7 +82,5 @@
       with_items:
         - regexp: '-vb"'
           replace: '-{{type}}"'
-        - regexp: 'file://builds'
-          replace: 'file://../builds'
         - regexp: '-RDF-'
           replace: '-{{vagrant_pre}}-'

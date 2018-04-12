@@ -5,9 +5,10 @@
 
   vars_prompt:
   - name: PR
-    prompt: Welche Version RDF/KA/SA_1/SA_2/PR
+    prompt: Welche Version RDF/KA/SA_1/SA_2/PR_SJ
     default: RDF
     private: no
+    when: PR is not defined
 
   tasks:
   - name: Get Version from file
@@ -40,6 +41,10 @@
   - block:
         - name: Bumb VERSION
           command: mv VERSION.bak VERSION
+        - name: Copy content of box in file
+          copy:
+            content: "{{ box }}"
+            dest: "{{PR}}-packer-{{mydate}}.err"
         - meta: end_play
     when: box|failed
 

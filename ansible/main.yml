@@ -1026,6 +1026,18 @@
              /usr/bin/screen -S sshscreen -D -RR  && exit
            fi
 
+    - name: Git clone Templates eg. flask
+      git:
+        dest: "/home/vagrant/{{item.repo}}"
+        force: yes
+        repo: "{{item.repo}}"
+        version: "{{item.version}}"
+      # Repro may with .git on github
+      with_items:
+        - repo: https://gitlab.franken.de/kraeml/flask-template
+          path: ais
+          version: master
+
     - block:
         - name: Ensure rdf directories exists
           become: yes

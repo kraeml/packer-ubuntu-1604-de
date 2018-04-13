@@ -1,0 +1,86 @@
+---
+- hosts: localhost
+
+  vars:
+    type: "desktop"
+    vagrant_pre: "{{type}}"
+    version: "{{ lookup('file', '../VERSION') }}"
+    path: ../vagrant-{{type}}
+    build_path: ../builds
+
+  pre_tasks:
+    - name: Setze Variablen Falls SA_x oder PR
+      set_fact:
+        vagrant_pre: "RDF"
+      when: type == "desktop"
+    - debug:
+        msg: "Type ist {{type}} und Prefix ist {{vagrant_pre}}"
+        verbosity: 1
+    - debug:
+        var: version
+        verbosity: 1
+    - name: Finde Vagrantfile mit Vagrantile.{{vagrant_pre}}-{{version}}
+      stat:
+        path: "../builds/Vagrantile.{{vagrant_pre}}-{{version}}"
+      register: vagrant_version
+    - name: Get latest file
+      block:
+        - name: Finde jüngste Vagrantfile
+          find:
+            paths: "{{build_path}}"
+            patterns: 'Vagrantfile.{{vagrant_pre}}*'
+            #use_regex: yes
+          register: found_vagrantfiles
+        - debug:
+            var: found_vagrantfiles
+            verbosity: 1
+        - set_fact:
+            latest_file: "{{ found_vagrantfiles.files | sort(attribute='mtime',reverse=true) | first }}"
+        - debug:
+            var: latest_file['path']
+            verbosity: 1
+        - set_fact:
+            version_parts: "{{latest_file['path'].split('-')[1:]}}"
+        - debug:
+            var: version_parts
+            verbosity: 1
+        - set_fact:
+            version: "{{version_parts | join('-') }}"
+      when: not vagrant_version.stat.exists
+    - debug:
+        var: version
+        verbosity: 1
+    - name: Erstelle Verzeichnisstruktur
+      file:
+        path: "{{path}}"
+        state: directory
+    - name: Lösche Vagrantfile
+      file:
+        path: "{{path}}/{{item}}"
+        state: absent
+        recurse: yes
+      with_items:
+        - Vagrantfile
+        - .vagrant
+      ignore_errors: yes
+
+  tasks:
+    - name: Kopiere Vagrantfile {{build_path}}/Vagrantfile.{{vagrant_pre}}-{{version}}
+      copy:
+        dest: "{{path}}/Vagrantfile"
+        src: "{{build_path}}/Vagrantfile.{{vagrant_pre}}-{{version}}"
+    - name: Link zu ../build erstellen
+      file:
+        path: "{{path}}/builds"
+        src: "{{build_path}}"
+        state: link
+    - name: Manipulate Vagrantfile
+      replace:
+        path: "{{path}}/Vagrantfile"
+        regexp: '{{item.regexp}}'
+        replace: '{{item.replace}}'
+      with_items:
+        - regexp: '-vb"'
+          replace: '-{{type}}"'
+        - regexp: '-RDF-'
+          replace: '-{{vagrant_pre}}-'

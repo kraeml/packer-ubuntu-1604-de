@@ -32,7 +32,7 @@ Vagrant.configure("2") do |config|
   # See https://github.com/maoueh/nugrant
   config.user.defaults = {
     "virtualbox" => {
-      "name" => "rdf-dev-vb",
+      "name" => "rdf-dev-desktop",
       "gui" => true,
       "cpus" => 2,
       "vram" => "32",
@@ -76,7 +76,7 @@ Vagrant.configure("2") do |config|
 #SCRIPT
     rdf.ssh.insert_key = config.user.rdf.insert_key
     rdf.vm.hostname = config.user.rdf.hostname
-    rdf.vm.box = "file://builds/virtualbox-ubuntu1604-SA_2-18.04.13-11.box"
+    rdf.vm.box = "file://builds/virtualbox-ubuntu1604-RDF-18.04.10-22.box"
     rdf.vm.network :private_network, ip: config.user.rdf.private_network_ip
     rdf.vm.network :private_network, ip: config.user.rdf.private_network_dummy_ip
 

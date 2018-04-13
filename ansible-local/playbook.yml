@@ -82,6 +82,7 @@
       copy:
         dest: "{{path}}/VERSION"
         content: "{{version}}"
+        backup: yes
 
   tasks:
     - name: Kopiere Vagrantfile {{build_path}}/Vagrantfile.{{vagrant_pre}}-{{version}}
@@ -105,5 +106,5 @@
           replace: '-{{vagrant_pre}}-'
     - name: Backup Ablage
       archive:
-        dest: "{{path}}/{{vagrant_pre}}-Ablage-{{pre_version}}.tgz"
+        dest: "{{path}}/{{vagrant_pre}}-Ablage-{{pre_version}}-{{lookup('pipe','date +%y.%m.%d-%H-%M')}}.tgz"
         path: "{{path}}/{{vagrant_pre}}-Ablage"

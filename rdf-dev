@@ -8,6 +8,7 @@ else
 	COMMAND=$2
 	VAGRANT_PATH=$VAGRANT_BUILD_PATH/vagrant-$1/
 fi
+OLD=$PWD
 cd $VAGRANT_PATH
 if [ $COMMAND == "neu" ]
 then
@@ -21,7 +22,9 @@ then
 			vagrant up rdf
 		else
 			cd $VAGRANT_BUILD_PATH
+			set -e
 			ansible-playbook ansible-local/playbook.yml  --extra-vars="type=$1"
+			set +e
 			cd -
 			vagrant up rdf
 			vagrant ssh rdf
@@ -34,4 +37,4 @@ else
 	fi
 	vagrant $COMMAND rdf
 fi
-cd -
+cd $OLD

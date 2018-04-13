@@ -525,6 +525,7 @@
         - music21
         - boto3
         - botocore
+        - python-language-server[all]
       tags:
         - python-dev
 
@@ -912,7 +913,7 @@
             # and end respectively of I(each line) of the file.
             dest: "/usr/share/lxc/templates/lxc-ubuntu"
             # The file to modify.
-            replace: "apt-transport-https,ssh,vim,manpages,man-db,bash-completion,whois,python,python-apt,dnsutils,nginx,mongodb,python-flask"
+            replace: "apt-transport-https,ssh,vim,manpages,man-db,bash-completion,whois,python,python-apt,dnsutils,nginx,mongodb,python-flask,python3-flask"
 
       - name: Create a stopped container
         become: yes
@@ -1025,6 +1026,31 @@
              echo "SSH no active"
              /usr/bin/screen -S sshscreen -D -RR  && exit
            fi
+
+    - block:
+      - name: Git clone Templates eg. flask
+        git:
+          dest: "/home/vagrant/{{item.dest}}"
+          force: yes
+          repo: "{{item.repo}}"
+          version: "{{item.version}}"
+        # Repro may with .git on github
+        with_items:
+          - repo: https://gitlab.franken.de/kraeml/flask-template
+            dest: flask-template
+            version: master
+      - name: Install Flask-dependencies
+        become: yes
+        apt:
+          name: "{{item}}"
+        with_items:
+          - firefox
+          - python-flask
+          - python3-flask
+          - python3-venv
+          - python-virtualenv
+      tags:
+        - flask
 
     - block:
         - name: Ensure rdf directories exists

@@ -30,17 +30,25 @@
             paths: "{{build_path}}"
             patterns: 'Vagrantfile.{{vagrant_pre}}*'
           register: found_vagrantfiles
-        - debug:
-            var: found_vagrantfiles
-            verbosity: 0
+        # Erstelle eine neuen Typen da Dateien nicht exisitieren
         - block:
           - name: Fragen ob {{type}} erstellt wird
             pause:
               seconds: 30
               prompt: Soll die {{type}} erstellt werden?
           - shell: DEBUG=true PR={{type}} bin/box build ubuntu1604-desktop-de-PR virtualbox
+            args:
+              chdir: ../
           when: found_vagrantfiles.matched == 0
-        # ToDo falls nicht erstellet, dann fragen ob erstellt werden soll.
+        # Workaroaund weil in block überschrieben wird
+        - name: Finde alle {{vagrant_pre}} Vagrantfiles
+          find:
+            paths: "{{build_path}}"
+            patterns: 'Vagrantfile.{{vagrant_pre}}*'
+          register: found_vagrantfiles
+        - debug:
+            var: found_vagrantfiles
+            verbosity: 0
         - name: Ermittle letztes Vagrantfile von {{vagrant_pre}}
           set_fact:
             latest_file: "{{ found_vagrantfiles.files | sort(attribute='mtime',reverse=true) | first }}"

@@ -32,7 +32,14 @@
           register: found_vagrantfiles
         - debug:
             var: found_vagrantfiles
-            verbosity: 1
+            verbosity: 0
+        - block:
+          - name: Fragen ob {{type}} erstellt wird
+            pause:
+              seconds: 30
+              prompt: Soll die {{type}} erstellt werden?
+          - shell: DEBUG=true PR={{type}} bin/box build ubuntu1604-desktop-de-PR virtualbox
+          when: found_vagrantfiles.matched == 0
         # ToDo falls nicht erstellet, dann fragen ob erstellt werden soll.
         - name: Ermittle letztes Vagrantfile von {{vagrant_pre}}
           set_fact:

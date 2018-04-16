@@ -14,7 +14,7 @@
 - src: toopy.lxc-dev
 - src: gantsign.keyboard
 - src: gantsign.lightdm
-- src: https://github.com/gantsign/ansible-role-xdesktop/archive/2.2.3.tar.gz
+- src: https://github.com/gantsign/ansible-role-xdesktop/archive/2.3.0.tar.gz
   name: gantsign.xdesktop
 - src: gantsign.terminator
 - src: tschifftner.firefox
@@ -35,7 +35,9 @@
 - src: tersmitten.ansible
 - src: angstwad.docker_ubuntu
 - src: gantsign.kubernetes
-- src: gantsign.molecule
+- src: https://github.com/gantsign/ansible-role-molecule
+  version: pip-10-fix
+  name: gantsign.molecule
 - src: franklinkim.git
 - src: wtanaka.vagrant
 - src: https://github.com/kraeml/ansible-role-jupyter

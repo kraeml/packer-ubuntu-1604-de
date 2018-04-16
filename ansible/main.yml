@@ -18,9 +18,12 @@
         nodejs_version: 6.x
         phantomjs_version: "2.1.1"
         ruby_version: 2.4.3
-        molecule_version: '2.7.0'
+        molecule_version: '2.12.1'
         vagrant: 2.0.2
         phpmyadmin: "4.7.7"
+      virtualenv_dependencies:
+        - python
+        - python-pip
 
   roles:
     - role: geerlingguy.nfs
@@ -117,6 +120,7 @@
         - python-dev
 
     - role: tersmitten.virtualenv
+
       become: yes
       tags:
         - python-dev
@@ -425,6 +429,7 @@
 
     - role: greendayonfire.mongodb
       become: yes
+      mongodb_pymongo_from_pip: false
       mongodb_security_authorization: "enabled"
       mongodb_users:
       - name: "{{db_user.name}}"
@@ -457,6 +462,9 @@
       tags:
         - docker
         - molecule
+        - todo
+        # 10-pip-fix
+        - open_issue
 
     - role: wtanaka.vagrant
       become: yes

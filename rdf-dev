@@ -4,9 +4,16 @@ VAGRANT_BUILD_PATH=~/Dokumente/Schule/Bento-Boxen/packer-ubuntu-1604-de
 if [ -z $2 ]
 then
 	COMMAND=$1
+	VAGRANT_PATH=$VAGRANT_BUILD_PATH
+	TYPE=desktop
 else
 	COMMAND=$2
 	VAGRANT_PATH=$VAGRANT_BUILD_PATH/vagrant-$1/
+	TYPE=$1
+fi
+if [ ! -d $VAGRANT_PATH ]
+then
+	mkdir -p $VAGRANT_PATH
 fi
 OLD=$PWD
 cd $VAGRANT_PATH
@@ -17,18 +24,18 @@ then
 	if [[ $REPLY =~ ^[Yy]$ ]]
 	then
 		vagrant destroy --force
-		if [ -z $2 ]
+		# Falls ein Type angegeben wurde neuen suchen
+		# Ansonsten im Buildverzeichnie einfach starten
+		if [ ! -z $2 ]
 		then
-			vagrant up rdf
-		else
 			cd $VAGRANT_BUILD_PATH
 			set -e
-			ansible-playbook ansible-local/playbook.yml  --extra-vars="type=$1"
+			ansible-playbook ansible-local/playbook.yml  --extra-vars="type=$TYPE"
 			set +e
 			cd -
-			vagrant up rdf
-			vagrant ssh rdf
 		fi
+		vagrant up rdf
+		vagrant ssh rdf
 	fi
 else
 	if [ $COMMAND == "ssh" ]

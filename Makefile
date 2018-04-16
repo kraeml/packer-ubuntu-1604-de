@@ -1,6 +1,6 @@
 desktop:
 	TMPDIR=/home/michl/tmp bin/box build ubuntu1604-desktop-de virtualbox
-  ansible-playbook ansible-local/playbook.yml
+	ansible-playbook ansible-local/playbook.yml
 
 desktop-virtualbox:
 	TMPDIR=/home/michl/tmp bin/box build ubuntu1604-desktop-de virtualbox

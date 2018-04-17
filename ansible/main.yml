@@ -884,7 +884,7 @@
           update_cache: yes
           cache_valid_time: 3600
         with_items:
-          - lxc
+          - lxc=2.1.1-0ubuntu1~ubuntu16.04.1~ppa1
           - lxd
           - python-lxc
           - openvswitch-switch
@@ -922,6 +922,9 @@
             dest: "/usr/share/lxc/templates/lxc-ubuntu"
             # The file to modify.
             replace: "apt-transport-https,ssh,vim,manpages,man-db,bash-completion,whois,python,python-apt,dnsutils,nginx,mongodb,python-flask,python3-flask"
+        ignore_errors: yes
+        tags:
+          - testing
 
       - name: Create a stopped container
         become: yes

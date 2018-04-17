@@ -35,9 +35,7 @@
 - src: tersmitten.ansible
 - src: angstwad.docker_ubuntu
 - src: gantsign.kubernetes
-- src: https://github.com/gantsign/ansible-role-molecule
-  version: pip-10-fix
-  name: gantsign.molecule
+- src: gantsign.molecule
 - src: franklinkim.git
 - src: wtanaka.vagrant
 - src: https://github.com/kraeml/ansible-role-jupyter

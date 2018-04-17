@@ -212,14 +212,25 @@
             #- platformio-ide-debugger
           atom_config:
             "*":
+              "atom-ide-ui":
+                use: {}
+              "autocomplete-ansible":
+                pythonPaths: "/home/vagrant/.virtualenvs/$PROJECT_NAME/bin/python;$PROJECT/venv/bin/python;/usr/bin/python"
               core:
+                disabledPackages: [
+                  "linter"
+                ]
                 projectHome: "/home/vagrant/workspace"
+                telemetryConsent: "no"
               editor:
                 showIndentGuide: true
                 showInvisibles: true
+              welcome:
+                showOnStartup: false
       tags:
         - desktop
         - atom
+        - testing
 
     # Install Go package for Atom
     - role: gantsign.atom-packages
@@ -438,6 +449,7 @@
         database: app_development
       tags:
         - no_sql
+        - todo
 
     # Install Docker
     - role: angstwad.docker_ubuntu
@@ -880,11 +892,12 @@
         become: yes
         apt:
           name: "{{ item }}"
-          state: installed
+          state: present
           update_cache: yes
           cache_valid_time: 3600
         with_items:
-          - lxc=2.1.1-0ubuntu1~ubuntu16.04.1~ppa1
+          - lxc
+          - lxc-templates
           - lxd
           - python-lxc
           - openvswitch-switch
@@ -923,8 +936,6 @@
             # The file to modify.
             replace: "apt-transport-https,ssh,vim,manpages,man-db,bash-completion,whois,python,python-apt,dnsutils,nginx,mongodb,python-flask,python3-flask"
         ignore_errors: yes
-        tags:
-          - testing
 
       - name: Create a stopped container
         become: yes

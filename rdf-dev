@@ -1,6 +1,8 @@
 #!/bin/bash
 set -x
 VAGRANT_BUILD_PATH=~/Dokumente/Schule/Bento-Boxen/packer-ubuntu-1604-de
+#Falls kein zweites Kommando angegeben setze vagrant Command aus dem zustarten.
+#Pfad dann im Buildpath um dort zu starten. Type ist desktop.
 if [ -z $2 ]
 then
 	COMMAND=$1

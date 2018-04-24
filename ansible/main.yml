@@ -934,7 +934,7 @@
             # and end respectively of I(each line) of the file.
             dest: "/usr/share/lxc/templates/lxc-ubuntu"
             # The file to modify.
-            replace: "apt-transport-https,ssh,vim,manpages,man-db,bash-completion,whois,python,python-apt,dnsutils,nmap,nginx,mongodb,python-flask,python3-flask"
+            replace: "apt-transport-https,ssh,vim,manpages,man-db,bash-completion,whois,acl,python,python-apt,dnsutils,nmap,nginx,mongodb,python-flask,python3-flask"
         ignore_errors: yes
 
       - name: Create a stopped container

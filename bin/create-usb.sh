@@ -34,7 +34,7 @@ for i in  $(ls -d /media/michl/PR_*); do
       --ignore-errors \
       --delete \
       ./downloads/ ${i}/downloads/
-    rsync -av --progress --human-readable \
-      --exclude='.vagrant' ka-sa-pr-build ${i}
+    #rsync -av --progress --human-readable \
+    #  --exclude='.vagrant' ka-sa-pr-build ${i}
 done
 sync
